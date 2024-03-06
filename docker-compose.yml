@@ -13,7 +13,7 @@ services:
       - pg_data:/var/lib/postgresql/data
 
   backend:
-    build: ./backend/foodgram/ # адрес к Dockerfile
+    build: ./backend/
     env_file: .env
     depends_on:
       - db
@@ -23,13 +23,13 @@ services:
 
   frontend:
     env_file: .env
-    build: ./frontend/ # адрес к Dockerfile
+    build: ./frontend/
     command: cp -r /app/build/. /static/
     volumes:
       - static:/static
 
   gateway:
-    build: ./nginx/ # адрес к Dockerfile
+    build: ./nginx/
     env_file: .env
     depends_on:
       - backend
