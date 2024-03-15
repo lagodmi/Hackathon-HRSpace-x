@@ -4,6 +4,21 @@ from django.forms import ValidationError
 
 # Condition
 
+class Payment(models.Model):
+    PAYMENT_CHOICES = (
+        ('100%', '100% сразу'),
+        ('50-50', '50% сразу и 50% после'),
+        ('100-after', '100% после')
+    )
+
+    type = models.CharField(max_length=20, choices=PAYMENT_CHOICES)
+
+
+class Condition(models.Model):
+    """
+    Модель условия сотрудничества.
+    """
+    payment_type = models.ForeignKey(Payment, on_delete=models.CASCADE)
 
 PAYMENT_CHOICES = (
     ('100%', '100% сразу'),
