@@ -276,7 +276,7 @@ class Recruiter(models.Model):
         ordering = ('pk',)
 
 
-class Inquery(models.Model):
+class Inquiry(models.Model):
     """
         Модель заявки.
     """
@@ -323,7 +323,7 @@ class Inquery(models.Model):
             raise ValidationError(
                 'Зарплата "до" не может быть ниже, чем зарплата "от".'
             )
-        super(Inquery, self).clean()
+        super(Inquiry, self).clean()
 
     class Meta:
         verbose_name = 'Заявка'
@@ -332,33 +332,3 @@ class Inquery(models.Model):
 
     def __str__(self):
         return self.name
-
-
-
-
-
-
-
-
-
-    employeeResponsibilities = models.ManyToManyField(
-        Duty,
-        related_name='duty',
-        verbose_name='обязанности'
-    )
-    
-    softwareSkills = models.ManyToManyField(Skill,
-                                            related_name='skill_software',
-                                            verbose_name='Навыки')
-
-    def get_relevant_employeeResponsibilities(self):
-        """
-            Подбор релевантных обязанностей.
-        """
-        return Duty.objects.filter(profession__name=self.prof.prof_name)
-
-    def get_relevant_softwareSkills(self):
-        """
-            Подбор релевантных навыков.
-        """
-        return Skill.objects.filter(profession__name=self.prof.prof_name)
