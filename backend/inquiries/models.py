@@ -3,7 +3,6 @@ from django.forms import ValidationError
 from django.core.validators import MinValueValidator
 
 from .constants import (
-    ADDITIONAL_TASKS,
     CITIZENSHIP,
     EDUCATION,
     EMPLOYMENT_TYPE,
@@ -12,8 +11,6 @@ from .constants import (
     PAYMENT,
     RESUME_OPTIONS,
     SCHEDULE,
-    SKILLS_SPECIAL,
-    TASKS_RECRUITER
 )
 from .validators import (
     validate_desiredEmployeeExitDate_date,
@@ -89,11 +86,14 @@ class Profession(models.Model):
                                   verbose_name='профессиональная область',
                                   on_delete=models.CASCADE)
     prof_name = models.CharField(verbose_name='профессия',
-                                 max_length=100)
+                                 max_length=256)
     employeeResponsibilities = models.ManyToManyField(
-        Duty, verbose_name='обязанности'
+        Duty,
+        related_name='duty',
+        verbose_name='обязанности'
     )
     softwareSkills = models.ManyToManyField(Skill,
+                                            related_name='skill_software',
                                             verbose_name='Навыки')
 
     def get_relevant_employeeResponsibilities(self):
@@ -138,12 +138,12 @@ class SocialPackage(models.Model):
     """
         Модель социального пакета.
     """
-    name = models.CharField(verbose_name='бонус', max_length=256)
+    name = models.CharField(verbose_name='социальный пакет', max_length=256)
 
     class Meta:
         verbose_name = 'Социальный пакет'
         verbose_name_plural = 'Социальные пакеты'
-        ordering = ('prof_name',)
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
@@ -160,12 +160,28 @@ class Conditions(models.Model):
     contractType = models.TextField('verbose_name=Способ оформления',
                                     choices=EMPLOYMENT_METHOD)
     socialPackage = models.ManyToManyField(SocialPackage,
+                                           related_name='social_package',
                                            verbose_name='Социальный пакет')
-    
+
     class Meta:
         verbose_name = 'Условия работы'
         verbose_name_plural = 'Условия работы'
         ordering = ('pk',)
+
+
+class TaskRecruiter(models.Model):
+    """
+        Модель задачи рекрутера.
+    """
+    name = models.CharField(verbose_name='задача', max_length=256)
+
+    class Meta:
+        verbose_name = 'Задача'
+        verbose_name_plural = 'Задачи'
+        ordering = ('name',)
+
+    def __str__(self):
+        return self.name
 
 
 class Partnership(models.Model):
@@ -173,15 +189,17 @@ class Partnership(models.Model):
         Модель условия сотрудничества.
     """
     employeeReward = models.PositiveIntegerField(
-        'Вознаграждение',
+        verbose_name='вознаграждение',
         validators=(MinValueValidator(MIN_EMPLOYEE_REWARD),)
     )
-    paymentType = models.TextField(choices=PAYMENT)
+    paymentType = models.TextField(verbose_name='тип оплаты',
+                                   choices=PAYMENT)
     employeeCount = models.PositiveSmallIntegerField(
         verbose_name='количество сотрудников'
     )
-    recruiterTasks = models.TextField(verbose_name='задачи рекрутера',
-                                      choices=TASKS_RECRUITER)
+    recruiterTasks = models.ManyToManyField(TaskRecruiter,
+                                            related_name='task_recruiter',
+                                            verbose_name='задачи рекрутера')
     desiredFirstResumeDate = models.DateField(
         verbose_name='дата получения резюме',
         validators=(validate_desiredFirstResumeDate_date,)
@@ -214,6 +232,37 @@ class Company(models.Model):
         return self.name
 
 
+class TaskAdditional(models.Model):
+    """
+        Модель дополнительные задачи.
+    """
+    name = models.CharField(verbose_name='дополнительная задача',
+                            max_length=256)
+
+    class Meta:
+        verbose_name = 'Дополнительная задача'
+        verbose_name_plural = 'Дополнительные задачи'
+        ordering = ('name',)
+
+    def __str__(self):
+        return self.name
+
+
+class SkillRecruiter(models.Model):
+    """
+        Модель навыки рекрутера.
+    """
+    name = models.CharField(verbose_name='навык', max_length=256)
+
+    class Meta:
+        verbose_name = 'Навык'
+        verbose_name_plural = 'навыки'
+        ordering = ('name',)
+
+    def __str__(self):
+        return self.name
+
+
 class Recruiter(models.Model):
     """
         Модель требование к рекрутерам.
@@ -221,17 +270,17 @@ class Recruiter(models.Model):
     experienceYears = models.PositiveSmallIntegerField(
         verbose_name='трудовой стаж рекрутера'
     )
-    specialSkills = models.TextField(verbose_name='навыки рекрутера',
-                                     choices=SKILLS_SPECIAL)
-    additionalTasks = models.TextField(verbose_name='дополнительные задачи',
-                                       choices=ADDITIONAL_TASKS)
+    specialSkills = models.ManyToManyField(SkillRecruiter,
+                                           related_name='skill_recruiter',
+                                           verbose_name='навыки рекрутера')
+    additionalTasks = models.ManyToManyField(TaskAdditional,
+                                             related_name='task_additional',
+                                             verbose_name='задачи рекрутера')
     isIndividual = models.BooleanField(verbose_name='юрлица, ИП, самозанятые')
-    blacklistedCompanies = models.ManyToManyField(
-        Company, verbose_name='стоп лист компаний'
-    )
-    recruiterCount = models.SmallIntegerField(
-        verbose_name='количество рекрутеров'
-    )
+    blacklistedCompanies = models.ManyToManyField(Company,
+                                                  related_name='company',
+                                                  verbose_name='стоп лист')
+    recruiterCount = models.SmallIntegerField(verbose_name='число рекрутеров')
 
     class Meta:
         verbose_name = 'Требование к рекрутерам'
