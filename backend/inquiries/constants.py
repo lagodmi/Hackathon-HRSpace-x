@@ -40,15 +40,3 @@ EMPLOYMENT_METHOD = (
     ('2', 'Договор ГПХ с физ.лицом'),
     ('3', 'Договор ГПХ с ИП и самозанятым'),
 )
-
-TASKS_RECRUITER = (
-    (),
-)
-
-SKILLS_SPECIAL = (
-    (),
-)
-
-ADDITIONAL_TASKS = (
-    (),
-)
