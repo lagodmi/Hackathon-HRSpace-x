@@ -1,14 +1,23 @@
 from django.db import models
 from django.forms import ValidationError
+from django.core.validators import MinValueValidator
+
 from .constants import (
+    ADDITIONAL_TASKS,
     CITIZENSHIP,
     EDUCATION,
     EMPLOYMENT_TYPE,
     EMPLOYMENT_METHOD,
+    MIN_EMPLOYEE_REWARD,
     PAYMENT,
     RESUME_OPTIONS,
     SCHEDULE,
-    HR
+    SKILLS_SPECIAL,
+    TASKS_RECRUITER
+)
+from .validators import (
+    validate_desiredEmployeeExitDate_date,
+    validate_desiredFirstResumeDate_date
 )
 
 
@@ -57,7 +66,10 @@ class Duty(models.Model):
 
 
 class Skill(models.Model):
-    name = models.CharField('Навык', max_length=256)
+    """
+        Модель навыка.
+    """
+    name = models.CharField(verbose_name='Навык', max_length=256)
 
     class Meta:
         verbose_name = 'Навык'
@@ -105,37 +117,14 @@ class Profession(models.Model):
         return self.prof_name
 
 
-class Salary(models.Model):
-    """
-        Модель зарплата.
-    """
-    salary_min = models.IntegerField(verbose_name='зарплата от')
-    salary_max = models.IntegerField(verbose_name='зарплата до')
-
-    def clean(self):
-        if self.salary_min and self.salary_max and \
-                self.salary_min > self.salary_max:
-            raise ValidationError(
-                'Зарплата "до" не может быть ниже, чем зарплата "от".'
-            )
-        super(Salary, self).clean()
-
-    class Meta:
-        verbose_name = 'Зарплата'
-        verbose_name_plural = 'Зарплаты'
-        ordering = ('pk',)
-
-    def __str__(self):
-        return f'зарплата от {str(self.salary_min)} до {str(self.salary_max)}'
-
-
 class Description(models.Model):
     """
         Модель описание вакансии.
     """
     education = models.TextField(verbose_name='образование', choices=EDUCATION)
     experience = models.PositiveSmallIntegerField(verbose_name='стаж')
-    citizenship = models.TextField(verbose_name='гражданство', choices=CITIZENSHIP)
+    citizenship = models.TextField(verbose_name='гражданство',
+                                   choices=CITIZENSHIP)
     drivingLicense = models.BooleanField(verbose_name='водительские права')
     carOwnership = models.BooleanField(verbose_name='автомобиль')
 
@@ -169,9 +158,9 @@ class Conditions(models.Model):
     workFormat = models.TextField(verbose_name='Формат работы',
                                   choices=EMPLOYMENT_TYPE)
     contractType = models.TextField('verbose_name=Способ оформления',
-                                        choices=EMPLOYMENT_METHOD)
+                                    choices=EMPLOYMENT_METHOD)
     socialPackage = models.ManyToManyField(SocialPackage,
-                                            verbose_name='Социальный пакет')
+                                           verbose_name='Социальный пакет')
     
     class Meta:
         verbose_name = 'Условия работы'
@@ -179,45 +168,75 @@ class Conditions(models.Model):
         ordering = ('pk',)
 
 
-# class Partnership(models.Model):
-#     """
-#         Модель условия сотрудничества.
-#     """
-#     payment_method = models.TextField(choices=PAYMENT)
-#     reward = models.PositiveIntegerField(
-#         'Вознаграждение',
-#         validators=[MinValueValidator(AMOUNT_MIN_VALUE)]
-#     )
-#     employment = models.PositiveSmallIntegerField('Количество Сотрудников')
-#     resume_date = models.DateField('Дата получения резюме')
-#     work_date = models.DateField('Дата выхода на работу')
-#     hr_duties = models.ManyToManyField(HRDuty,
-#                                        verbose_name='Что входит в'
-#                                                     'работу рекрутера')  # ?
-#     resume_method = models.TextField('Вид резюме', choices=RESUME_OPTIONS)
+class Partnership(models.Model):
+    """
+        Модель условия сотрудничества.
+    """
+    employeeReward = models.PositiveIntegerField(
+        'Вознаграждение',
+        validators=(MinValueValidator(MIN_EMPLOYEE_REWARD),)
+    )
+    paymentType = models.TextField(choices=PAYMENT)
+    employeeCount = models.PositiveSmallIntegerField(
+        verbose_name='количество сотрудников'
+    )
+    recruiterTasks = models.TextField(verbose_name='задачи рекрутера',
+                                      choices=TASKS_RECRUITER)
+    desiredFirstResumeDate = models.DateField(
+        verbose_name='дата получения резюме',
+        validators=(validate_desiredFirstResumeDate_date,)
+    )
+    desiredEmployeeExitDate = models.DateField(
+        verbose_name='дата выхода на работу',
+        validators=(validate_desiredEmployeeExitDate_date,)
+    )
+    resumeFormat = models.TextField(verbose_name='Вид резюме',
+                                    choices=RESUME_OPTIONS)
 
-#     class Meta:
-#         verbose_name = 'Условия сотрудничества'
-#         verbose_name_plural = 'Условия сотрудничества'
-#         ordering = ('pk',)
+    class Meta:
+        verbose_name = 'Условия сотрудничества'
+        verbose_name_plural = 'Условия сотрудничества'
+        ordering = ('pk',)
 
 
-# class Recruiter(models.Model):
-#     """
-#         Модель требование к рекрутерам.
-#     """
-#     hr_experience = models.PositiveSmallIntegerField('Трудовой стаж рекрутера')
-#     hr_skills = models.ManyToManyField(HRSkill,
-#                                        verbose_name='Навыки рекрутера')  # ?
-#     additional_tasks = models.TextField('Дополнительные задачи')
-#     firms_only = models.BooleanField('Только для юрлиц, ИП, самозанятых')
-#     black_list = models.TextField('Стоп-лист')
-#     hr_number = models.SmallIntegerField('Количество рекрутеров')
+class Company(models.Model):
+    """
+        Модель компании.
+    """
+    name = models.CharField(verbose_name='компания', max_length=256)
 
-#     class Meta:
-#         verbose_name = 'Требование к рекрутерам'
-#         verbose_name_plural = 'Требования к рекрутерам'
-#         ordering = ('pk',)
+    class Meta:
+        verbose_name = 'Компания'
+        verbose_name_plural = 'Компании'
+        ordering = ('name',)
+
+    def __str__(self):
+        return self.name
+
+
+class Recruiter(models.Model):
+    """
+        Модель требование к рекрутерам.
+    """
+    experienceYears = models.PositiveSmallIntegerField(
+        verbose_name='трудовой стаж рекрутера'
+    )
+    specialSkills = models.TextField(verbose_name='навыки рекрутера',
+                                     choices=SKILLS_SPECIAL)
+    additionalTasks = models.TextField(verbose_name='дополнительные задачи',
+                                       choices=ADDITIONAL_TASKS)
+    isIndividual = models.BooleanField(verbose_name='юрлица, ИП, самозанятые')
+    blacklistedCompanies = models.ManyToManyField(
+        Company, verbose_name='стоп лист компаний'
+    )
+    recruiterCount = models.SmallIntegerField(
+        verbose_name='количество рекрутеров'
+    )
+
+    class Meta:
+        verbose_name = 'Требование к рекрутерам'
+        verbose_name_plural = 'Требования к рекрутерам'
+        ordering = ('pk',)
 
 
 class Inquery(models.Model):
@@ -229,7 +248,8 @@ class Inquery(models.Model):
                              related_name='prof', verbose_name='профессия')
     city = models.ForeignKey(City, on_delete=models.CASCADE,
                              related_name='city', verbose_name='город')
-    salaryRange = models.OneToOneField(Salary, verbose_name='зарплата')
+    salary_min = models.IntegerField(verbose_name='зарплата от')
+    salary_max = models.IntegerField(verbose_name='зарплата до')
     description = models.OneToOneField(Description,
                                        verbose_name='описание вакансии')
     conditions = models.OneToOneField(Conditions,
@@ -238,7 +258,15 @@ class Inquery(models.Model):
                                        verbose_name='условия сотрудничества')
     recruiter = models.OneToOneField(Recruiter,
                                      verbose_name='требования к рекрутерам')
-    
+
+    def clean(self):
+        if self.salary_min and self.salary_max and \
+                self.salary_min > self.salary_max:
+            raise ValidationError(
+                'Зарплата "до" не может быть ниже, чем зарплата "от".'
+            )
+        super(Inquery, self).clean()
+
     class Meta:
         verbose_name = 'Заявка'
         verbose_name_plural = 'Заявки'
@@ -246,41 +274,3 @@ class Inquery(models.Model):
 
     def __str__(self):
         return self.name
-    
-
-# проверить и подогнать под поля модели Recruiter и Partnership
-# посмотреть константы и запросить у коллег что там должно лежать
-# поля json которые не разобрал еще 
-#                                   |
-#                                   |
-#                                 \ | /
-#                                  \ /
-#                                   v
-
-    "employeeReward": 10000000,
-    "paymentType": "50% за выход + 50% по окончании гарантийного периода (1-3 мес.)",
-    "employeeCount": 5,
-    "recruiterTasks": [
-        "Организация собеседований с заказчиком, синхронизация по времени соискателя и заказчика"
-    ],
-    "resumeFormat": "Резюме кандидатов, с которыми проведено интервью (с комментариями)",
-    "dates": {
-        "desiredFirstResumeDate": 1710720000000,
-        "desiredEmployeeExitDate": 1711497600000
-    },
-    "experienceYears": 4,
-    "specialSkills": [
-        "Проведение собеседований",
-        "Работа с HR-платформами",
-        "Оценка компетенций"
-    ],
-    "additionalTasks": [
-        "Организация тренингов и семинаров для повышения квалификации персонала",
-        "Ведение отчетности по итогам подбора персонала",
-        "Анализ эффективности каналов поиска кандидатов"
-    ],
-    "isIndividual": true,
-    "blacklistedCompanies": [],
-    "recruiterCount": 1,
-    "acceptOffer": true
-
