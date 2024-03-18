@@ -52,11 +52,15 @@ class ProfessionArea(models.Model):
 
 class Duty(models.Model):
     name = models.CharField('Обязанность', max_length=256)
+    profession = models.ForeignKey('Profession',
+                                   on_delete=models.CASCADE,
+                                   related_name='duties',
+                                   verbose_name='профессия')
 
     class Meta:
         verbose_name = 'Обязанность'
         verbose_name_plural = 'Обязанности'
-        ordering = ('prof_area',)
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
@@ -67,6 +71,10 @@ class Skill(models.Model):
         Модель навыка.
     """
     name = models.CharField(verbose_name='Навык', max_length=256)
+    profession = models.ForeignKey('Profession',
+                                   on_delete=models.CASCADE,
+                                   related_name='skills',
+                                   verbose_name='профессия')
 
     class Meta:
         verbose_name = 'Навык'
@@ -87,26 +95,6 @@ class Profession(models.Model):
                                   on_delete=models.CASCADE)
     prof_name = models.CharField(verbose_name='профессия',
                                  max_length=256)
-    employeeResponsibilities = models.ManyToManyField(
-        Duty,
-        related_name='duty',
-        verbose_name='обязанности'
-    )
-    softwareSkills = models.ManyToManyField(Skill,
-                                            related_name='skill_software',
-                                            verbose_name='Навыки')
-
-    def get_relevant_employeeResponsibilities(self):
-        """
-            Подбор релевантных обязанностей.
-        """
-        return Duty.objects.filter(profession__name=self.name)
-
-    def get_relevant_softwareSkills(self):
-        """
-            Подбор релевантных навыков.
-        """
-        return Skill.objects.filter(profession__name=self.name)
 
     class Meta:
         verbose_name = 'Профессия'
@@ -295,6 +283,15 @@ class Inquery(models.Model):
     name = models.CharField('название', max_length=128)
     prof = models.ForeignKey(Profession, on_delete=models.CASCADE,
                              related_name='prof', verbose_name='профессия')
+    employeeResponsibilities = models.ManyToManyField(
+        Duty,
+        related_name='duty',
+        verbose_name='обязанности'
+    )
+    softwareSkills = models.ManyToManyField(Skill,
+                                            related_name='skill_software',
+                                            verbose_name='Навыки')
+
     city = models.ForeignKey(City, on_delete=models.CASCADE,
                              related_name='city', verbose_name='город')
     salary_min = models.IntegerField(verbose_name='зарплата от')
@@ -307,6 +304,18 @@ class Inquery(models.Model):
                                        verbose_name='условия сотрудничества')
     recruiter = models.OneToOneField(Recruiter,
                                      verbose_name='требования к рекрутерам')
+
+    def get_relevant_employeeResponsibilities(self):
+        """
+            Подбор релевантных обязанностей.
+        """
+        return self.prof.duties.all()
+
+    def get_relevant_softwareSkills(self):
+        """
+            Подбор релевантных навыков.
+        """
+        return self.prof.skills.all()
 
     def clean(self):
         if self.salary_min and self.salary_max and \
@@ -323,3 +332,33 @@ class Inquery(models.Model):
 
     def __str__(self):
         return self.name
+
+
+
+
+
+
+
+
+
+    employeeResponsibilities = models.ManyToManyField(
+        Duty,
+        related_name='duty',
+        verbose_name='обязанности'
+    )
+    
+    softwareSkills = models.ManyToManyField(Skill,
+                                            related_name='skill_software',
+                                            verbose_name='Навыки')
+
+    def get_relevant_employeeResponsibilities(self):
+        """
+            Подбор релевантных обязанностей.
+        """
+        return Duty.objects.filter(profession__name=self.prof.prof_name)
+
+    def get_relevant_softwareSkills(self):
+        """
+            Подбор релевантных навыков.
+        """
+        return Skill.objects.filter(profession__name=self.prof.prof_name)
