@@ -290,7 +290,8 @@ class Inquiry(models.Model):
     )
     softwareSkills = models.ManyToManyField(Skill,
                                             related_name='skill_software',
-                                            verbose_name='Навыки')
+                                            verbose_name='Навыки',
+                                            null=True, blank=True)
 
     city = models.ForeignKey(City, on_delete=models.CASCADE,
                              related_name='city', verbose_name='город')
