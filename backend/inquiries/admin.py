@@ -1,4 +1,5 @@
-from django.contrib import admin
+# from django.contrib import admin
+
 
 from .models import (Profession, Inquery, City, Company,
                      Skill, Duty, Partnership, Conditions,
