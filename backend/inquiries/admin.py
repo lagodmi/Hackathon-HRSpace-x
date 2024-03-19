@@ -1,7 +1,7 @@
-# from django.contrib import admin
+from django.contrib import admin
 
 
-from .models import (Profession, Inquery, City, Company,
+from .models import (Profession, Inquiry, City, Company,
                      Skill, Duty, Partnership, Conditions,
                      Recruiter, ProfessionArea, Description,
                      SocialPackage, TaskAdditional, SkillRecruiter,
@@ -23,7 +23,7 @@ class ProfessionAreaAdmin(admin.ModelAdmin):
 class ProfessionAdmin(admin.ModelAdmin):
     list_display = ('id', 'prof_area', 'prof_name')
     list_editable = ('prof_area', 'prof_name')
-    filter_horizontal = ('employeeResponsibilities', 'softwareSkills')
+    # filter_horizontal = ('employeeResponsibilities', 'softwareSkills')
 
 
 class SkillAdmin(admin.ModelAdmin):
@@ -107,7 +107,7 @@ class InqueryAdmin(admin.ModelAdmin):
 
 
 admin.site.register(City, CityAdmin)
-admin.site.register(Inquery, InqueryAdmin)
+admin.site.register(Inquiry, InqueryAdmin)
 admin.site.register(Profession, ProfessionAdmin)
 admin.site.register(ProfessionArea, ProfessionAreaAdmin)
 admin.site.register(Skill, SkillAdmin)
