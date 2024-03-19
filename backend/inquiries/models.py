@@ -44,7 +44,7 @@ class ProfessionArea(models.Model):
     class Meta:
         verbose_name = 'Профессиональная область'
         verbose_name_plural = 'Профессиональные области'
-        ordering = ('prof_area',)
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
@@ -56,7 +56,7 @@ class Duty(models.Model):
     class Meta:
         verbose_name = 'Обязанность'
         verbose_name_plural = 'Обязанности'
-        ordering = ('prof_area',)
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
@@ -255,8 +255,8 @@ class SkillRecruiter(models.Model):
     name = models.CharField(verbose_name='навык', max_length=256)
 
     class Meta:
-        verbose_name = 'Навык'
-        verbose_name_plural = 'навыки'
+        verbose_name = 'Навык рекрутера'
+        verbose_name_plural = 'навыки рекрутера'
         ordering = ('name',)
 
     def __str__(self):
@@ -299,13 +299,13 @@ class Inquery(models.Model):
                              related_name='city', verbose_name='город')
     salary_min = models.IntegerField(verbose_name='зарплата от')
     salary_max = models.IntegerField(verbose_name='зарплата до')
-    description = models.OneToOneField(Description,
+    description = models.OneToOneField(Description, on_delete=models.CASCADE,
                                        verbose_name='описание вакансии')
-    conditions = models.OneToOneField(Conditions,
+    conditions = models.OneToOneField(Conditions, on_delete=models.CASCADE,
                                       verbose_name='условия работы')
-    partnership = models.OneToOneField(Partnership,
+    partnership = models.OneToOneField(Partnership, on_delete=models.CASCADE,
                                        verbose_name='условия сотрудничества')
-    recruiter = models.OneToOneField(Recruiter,
+    recruiter = models.OneToOneField(Recruiter, on_delete=models.CASCADE,
                                      verbose_name='требования к рекрутерам')
 
     def clean(self):

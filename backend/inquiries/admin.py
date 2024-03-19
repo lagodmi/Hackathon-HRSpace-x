@@ -3,7 +3,8 @@ from django.contrib import admin
 from .models import (Profession, Inquery, City, Company,
                      Skill, Duty, Partnership, Conditions,
                      Recruiter, ProfessionArea, Description,
-                     SocialPackage, TaskAdditional, SkillRecruiter)
+                     SocialPackage, TaskAdditional, SkillRecruiter,
+                     TaskRecruiter)
 
 
 class CityAdmin(admin.ModelAdmin):
@@ -21,7 +22,7 @@ class ProfessionAreaAdmin(admin.ModelAdmin):
 class ProfessionAdmin(admin.ModelAdmin):
     list_display = ('id', 'prof_area', 'prof_name')
     list_editable = ('prof_area', 'prof_name')
-    filter_horizontal = ('employeeResponsibilities', 'softwareSkills') 
+    filter_horizontal = ('employeeResponsibilities', 'softwareSkills')
 
 
 class SkillAdmin(admin.ModelAdmin):
@@ -45,6 +46,11 @@ class DutyAdmin(admin.ModelAdmin):
 
 
 class CompanyAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name')
+    list_editable = ('name',)
+
+
+class TaskRecruiterAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
     list_editable = ('name',)
 
@@ -84,8 +90,7 @@ class PartnershipAdmin(admin.ModelAdmin):
 class RecruiterAdmin(admin.ModelAdmin):
     list_display = ('id', 'experienceYears', 'isIndividual',
                     'recruiterCount')
-    list_editable = ('experienceYears', 'specialSkills',
-                     'additionalTasks', 'isIndividual',
+    list_editable = ('experienceYears', 'isIndividual',
                      'recruiterCount')
     filter_horizontal = ('blacklistedCompanies', 'specialSkills',
                          'additionalTasks')
@@ -114,3 +119,4 @@ admin.site.register(Partnership, PartnershipAdmin)
 admin.site.register(Recruiter, RecruiterAdmin)
 admin.site.register(SkillRecruiter, SkillRecruiterAdmin)
 admin.site.register(TaskAdditional, TaskAdditionalAdmin)
+admin.site.register(TaskRecruiter, TaskRecruiterAdmin)
