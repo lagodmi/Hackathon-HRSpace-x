@@ -44,7 +44,7 @@ class ProfessionArea(models.Model):
     class Meta:
         verbose_name = 'Профессиональная область'
         verbose_name_plural = 'Профессиональные области'
-        ordering = ('prof_area',)
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
@@ -297,12 +297,16 @@ class Inquiry(models.Model):
     salary_min = models.IntegerField(verbose_name='зарплата от')
     salary_max = models.IntegerField(verbose_name='зарплата до')
     description = models.OneToOneField(Description,
+                                       on_delete=models.CASCADE,
                                        verbose_name='описание вакансии')
     conditions = models.OneToOneField(Conditions,
+                                      on_delete=models.CASCADE,
                                       verbose_name='условия работы')
     partnership = models.OneToOneField(Partnership,
+                                       on_delete=models.CASCADE,
                                        verbose_name='условия сотрудничества')
     recruiter = models.OneToOneField(Recruiter,
+                                     on_delete=models.CASCADE,
                                      verbose_name='требования к рекрутерам')
 
     def get_relevant_employeeResponsibilities(self):

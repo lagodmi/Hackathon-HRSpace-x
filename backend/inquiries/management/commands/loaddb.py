@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand
 import json
 
 from inquiries.models import(
-    City,
+    # City,
     Company,
     Profession,
     ProfessionArea,
@@ -16,7 +16,6 @@ from inquiries.models import(
 
 array = {
     Company: 'data/companies.json',
-    # Profession: 'data/prof.json',
     Skill: 'data/programs.json',
     SkillRecruiter: 'data/specialSkills.json',
     SocialPackage: 'data/socialPackage.json',
@@ -37,16 +36,33 @@ class Command(BaseCommand):
                         name=row['name']
                     )
             self.stdout.write(self.style.SUCCESS(
-                'Data from add_file loaded successfully'
+                f'Data from {add_file} loaded successfully'
             ))
 
-        with open('data/districts.json', 'r', encoding='utf-8') as file:
+        # # Это не надо наверно.
+        # with open('data/districts.json', 'r', encoding='utf-8') as file:
+        #     reader = json.load(file)
+        #     for row in reader:
+        #         City.objects.create(
+        #             id=row[id],
+        #             name=row['name']
+        #         )
+        # self.stdout.write(self.style.SUCCESS(
+        #     'Data from add_file loaded successfully'
+        # ))
+
+        with open('data/prof.json', 'r', encoding='utf-8') as file:
             reader = json.load(file)
             for row in reader:
-                City.objects.create(
-                    id = row[id],
-                    name=row['name']
+                prof_area, _ = ProfessionArea.objects.get_or_create(
+                    name=row['prof_area']
                 )
+                Profession.objects.create(
+                    id=row['id'],
+                    prof_area=prof_area,
+                    prof_name=row['prof_name']
+                )
+
         self.stdout.write(self.style.SUCCESS(
-            'Data from add_file loaded successfully'
+            'Data from data/prof.json loaded successfully'
         ))
