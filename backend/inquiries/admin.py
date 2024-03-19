@@ -1,44 +1,123 @@
 # from django.contrib import admin
 
-# from .models import Location, Profession, Inquery, City
+
+from .models import (Profession, Inquery, City, Company,
+                     Skill, Duty, Partnership, Conditions,
+                     Recruiter, ProfessionArea, Description,
+                     SocialPackage, TaskAdditional, SkillRecruiter,
+                     TaskRecruiter)
 
 
-# class PositionInline(admin.TabularInline):
-
-#     model = IngredientsRecipe
-#     verbose_name = "Ингредиент"
-#     verbose_name_plural = "Ингредиент"
-#     min_num = 1
-
-# class CityAdmin(admin.ModelAdmin):
-#     list_display = ('id', 'name')
-#     list_filter = ('name', )
-#     list_editable = ('name',)
-#     search_fields = ('name', )
+class CityAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name')
+    list_filter = ('name', )
+    list_editable = ('name',)
+    search_fields = ('name', )
 
 
-# class LocationAdmin(admin.ModelAdmin):
-#     list_display = ('id', 'name', 'city')
-#     list_filter = ('city', )
-#     list_editable = ('city',)
-#     search_fields = ('city', )
+class ProfessionAreaAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name')
+    list_editable = ('name',)
 
 
-# class ProfessionAdmin(admin.ModelAdmin):
-#     list_display = ('id', 'name')
-#     list_editable = ('name')
+class ProfessionAdmin(admin.ModelAdmin):
+    list_display = ('id', 'prof_area', 'prof_name')
+    list_editable = ('prof_area', 'prof_name')
+    filter_horizontal = ('employeeResponsibilities', 'softwareSkills')
 
 
-# class InqueryAdmin(admin.ModelAdmin):
-#     list_display = ('id', 'title', 'location', 'profession', 'salary_low',
-#                     'salary_high', 'description', 'employment', 'payment',
-#                     'reward', 'resume_date', 'work_date', 'hr_number',
-#                     'hr_duties', 'resume_opt', 'conditions')
-#     list_editable = ('title', 'location', 'reward', 'profession',
-#                      'salary_high', 'salary_low')
+class SkillAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name')
+    list_editable = ('name',)
 
 
-# admin.site.register(City, CityAdmin)
-# admin.site.register(Inquery, InqueryAdmin)
-# admin.site.register(Location, LocationAdmin)
-# admin.site.register(Profession, ProfessionAdmin)
+class TaskAdditionalAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name')
+    list_editable = ('name',)
+
+
+class SkillRecruiterAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name')
+    list_editable = ('name',)
+
+
+class DutyAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name')
+    list_editable = ('name',)
+
+
+class CompanyAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name')
+    list_editable = ('name',)
+
+
+class TaskRecruiterAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name')
+    list_editable = ('name',)
+
+
+class DescriptionAdmin(admin.ModelAdmin):
+    list_display = ('id', 'education', 'experience', 'citizenship',
+                    'drivingLicense', 'carOwnership')
+    list_editable = ('education', 'experience', 'citizenship',
+                     'drivingLicense', 'carOwnership')
+
+
+class SocialPackageAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name')
+    list_editable = ('name',)
+
+
+class ConditionsAdmin(admin.ModelAdmin):
+    list_display = ('id', 'workSchedule', 'workFormat',
+                    'contractType')
+    list_editable = ('workSchedule', 'workFormat',
+                     'contractType')
+    filter_horizontal = ('socialPackage',)
+
+
+class PartnershipAdmin(admin.ModelAdmin):
+    list_display = ('id', 'employeeReward', 'paymentType',
+                    'employeeCount',
+                    'desiredFirstResumeDate', 'desiredEmployeeExitDate',
+                    'resumeFormat')
+    list_editable = ('employeeReward', 'paymentType',
+                     'employeeCount',
+                     'desiredFirstResumeDate', 'desiredEmployeeExitDate',
+                     'resumeFormat')
+    filter_horizontal = ('recruiterTasks',)
+
+
+class RecruiterAdmin(admin.ModelAdmin):
+    list_display = ('id', 'experienceYears', 'isIndividual',
+                    'recruiterCount')
+    list_editable = ('experienceYears', 'isIndividual',
+                     'recruiterCount')
+    filter_horizontal = ('blacklistedCompanies', 'specialSkills',
+                         'additionalTasks')
+
+
+class InqueryAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'prof', 'city', 'salary_min',
+                    'salary_max', 'description', 'conditions',
+                    'partnership', 'recruiter')
+    list_editable = ('name', 'prof', 'city', 'salary_min',
+                     'salary_max', 'description', 'conditions',
+                     'partnership', 'recruiter')
+
+
+admin.site.register(City, CityAdmin)
+admin.site.register(Inquery, InqueryAdmin)
+admin.site.register(Profession, ProfessionAdmin)
+admin.site.register(ProfessionArea, ProfessionAreaAdmin)
+admin.site.register(Skill, SkillAdmin)
+admin.site.register(Duty, DutyAdmin)
+admin.site.register(Description, DescriptionAdmin)
+admin.site.register(Company, CompanyAdmin)
+admin.site.register(Conditions, ConditionsAdmin)
+admin.site.register(SocialPackage, SocialPackageAdmin)
+admin.site.register(Partnership, PartnershipAdmin)
+admin.site.register(Recruiter, RecruiterAdmin)
+admin.site.register(SkillRecruiter, SkillRecruiterAdmin)
+admin.site.register(TaskAdditional, TaskAdditionalAdmin)
+admin.site.register(TaskRecruiter, TaskRecruiterAdmin)

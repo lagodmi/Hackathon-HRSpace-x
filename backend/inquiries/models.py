@@ -243,8 +243,8 @@ class SkillRecruiter(models.Model):
     name = models.CharField(verbose_name='навык', max_length=256)
 
     class Meta:
-        verbose_name = 'Навык'
-        verbose_name_plural = 'навыки'
+        verbose_name = 'Навык рекрутера'
+        verbose_name_plural = 'навыки рекрутера'
         ordering = ('name',)
 
     def __str__(self):
