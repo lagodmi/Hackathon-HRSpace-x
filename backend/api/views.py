@@ -1,3 +1,19 @@
-from django.shortcuts import render
+from rest_framework import status, viewsets, filters
+from rest_framework import permissions
+from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
 
-# Create your views here.
+from .serializers import (InquirySerializer)
+from inquiries.models import (Inquiry,Skill,Duty)
+
+
+class InquiryViewSet(viewsets.ModelViewSet):
+    """
+    Вьюсет для для заявок.
+    """
+    queryset = Inquiry.objects.all()
+    serializer_class = InquirySerializer
+    # pagination_class = CustomPaginator
+    # permission_classes = (IsAuthorStaffOrReadOnly,)
+    # filter_backends = (DjangoFilterBackend, )
+    # filterset_class = RecipeFilter

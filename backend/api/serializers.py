@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from inquiries.constants import MIN_EMPLOYEE_REWARD
+
 
 from inquiries.models import (
     City,
@@ -104,7 +106,7 @@ class DutySerializer(serializers.ModelSerializer):
     """
         Сериализатор для модели обязанности.
     """
-    profession = ProfessionSerializer()
+    profession = ProfessionAreaSerializer()
 
     class Meta:
         model = Duty
@@ -115,64 +117,72 @@ class SkillSerializer(serializers.ModelSerializer):
     """
         Сериализатор для модели навыка.
     """
-    profession = ProfessionSerializer()
+    profession = ProfessionAreaSerializer()
 
     class Meta:
         model = Skill
         fields = ('id', 'name', 'profession')
 
 
+class ConditionsSerializer(serializers.ModelSerializer):
+    """
+        Сериализатор для модели условия работы.
+    """
+    socialPackage = SocialPackageSerializer(many=True)
+
+    class Meta:
+        model = Conditions
+        fields = "__all__"
 
 
+class DescriptionSerializer(serializers.ModelSerializer):
+    """
+        Сериализатор для модели описание вакансии.
+    """
+
+    class Meta:
+        model = Description
+        fields = "__all__"
 
 
+class PartnershipSerializer(serializers.ModelSerializer):
+    """
+        Сериализатор для модели условия сотрудничества.
+    """
+    recruiterTasks = TaskRecruiterSerializer(many=True)
+    employeeReward = serializers.IntegerField(min_value=MIN_EMPLOYEE_REWARD)
+
+    class Meta:
+        model = Partnership
+        fields = "__all__"
 
 
-# class ConditionsSerializer(serializers.ModelSerializer):
-#     """
-#         Сериализатор для модели условия работы.
-#     """
+class RecruiterSerializer(serializers.ModelSerializer):
+    """
+        Сериализатор для модели требование к рекрутерам.
+    """
+    specialSkills = SkillRecruiterSerializer()
+    additionalTasks = TaskAdditionalSerializer()
+    blacklistedCompanies = CompanySerializer()
 
-#     class Meta:
-#         model = Conditions
-#         fields = "__all__"
-
-
-# class DescriptionSerializer(serializers.ModelSerializer):
-#     """
-#         Сериализатор для модели описание вакансии.
-#     """
-
-#     class Meta:
-#         model = Description
-#         fields = "__all__"
+    class Meta:
+        model = Recruiter
+        fields = "__all__"
 
 
-# class InquirySerializer(serializers.ModelSerializer):
-#     """
-#         Сериализатор для модели заявки.
-#     """
+class InquirySerializer(serializers.ModelSerializer):
+    """
+        Сериализатор для модели заявки.
+    """
+    prof = ProfessionSerializer()
+    employeeResponsibilities = DutySerializer(many=True)
+    softwareSkills = SkillSerializer(many=True)
+    city = CitySerializer()
+    description = DescriptionSerializer()
+    conditions = ConditionsSerializer()
+    partnership = PartnershipSerializer()
+    recruiter = RecruiterSerializer()
 
-#     class Meta:
-#         model = Inquiry
-#         fields = "__all__"
-
-
-# class PartnershipSerializer(serializers.ModelSerializer):
-#     """
-#         Сериализатор для модели условия сотрудничества.
-#     """
-
-#     class Meta:
-#         model = Partnership
-#         fields = "__all__"
-
-
-# class RecruiterSerializer(serializers.ModelSerializer):
-#     """
-#         Сериализатор для модели требование к рекрутерам.
-#     """
-
-#     class Meta:
-#         model = Recruiter
-#         fields = "__all__"
+    class Meta:
+        model = Inquiry
+        fields = "__all__"
