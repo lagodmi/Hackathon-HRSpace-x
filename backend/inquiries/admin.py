@@ -2,7 +2,7 @@ from django.contrib import admin
 
 
 from .models import (Profession, Inquiry, City, Company,
-                     Skill, Duty, Partnership, Conditions,
+                     Software, Duty, Partnership, Conditions,
                      Recruiter, ProfessionArea, Description,
                      SocialPackage, TaskAdditional, SkillRecruiter,
                      TaskRecruiter)
@@ -23,10 +23,9 @@ class ProfessionAreaAdmin(admin.ModelAdmin):
 class ProfessionAdmin(admin.ModelAdmin):
     list_display = ('id', 'prof_area', 'prof_name')
     list_editable = ('prof_area', 'prof_name')
-    # filter_horizontal = ('employeeResponsibilities', 'softwareSkills')
 
 
-class SkillAdmin(admin.ModelAdmin):
+class SoftwareAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
     list_editable = ('name',)
 
@@ -97,7 +96,7 @@ class RecruiterAdmin(admin.ModelAdmin):
                          'additionalTasks')
 
 
-class InqueryAdmin(admin.ModelAdmin):
+class InquiryAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'prof', 'city', 'salary_min',
                     'salary_max', 'description', 'conditions',
                     'partnership', 'recruiter')
@@ -107,10 +106,10 @@ class InqueryAdmin(admin.ModelAdmin):
 
 
 admin.site.register(City, CityAdmin)
-admin.site.register(Inquiry, InqueryAdmin)
+admin.site.register(Inquiry, InquiryAdmin)
 admin.site.register(Profession, ProfessionAdmin)
 admin.site.register(ProfessionArea, ProfessionAreaAdmin)
-admin.site.register(Skill, SkillAdmin)
+admin.site.register(Software, SoftwareAdmin)
 admin.site.register(Duty, DutyAdmin)
 admin.site.register(Description, DescriptionAdmin)
 admin.site.register(Company, CompanyAdmin)
