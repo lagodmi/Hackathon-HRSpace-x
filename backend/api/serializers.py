@@ -105,7 +105,7 @@ class DutySerializer(serializers.ModelSerializer):
     """
         Сериализатор для модели обязанности.
     """
-    profession = ProfessionSerializer()
+    profession = ProfessionAreaSerializer()
 
     class Meta:
         model = Duty
@@ -116,7 +116,7 @@ class SkillSerializer(serializers.ModelSerializer):
     """
         Сериализатор для модели навыка.
     """
-    profession = ProfessionSerializer()
+    profession = ProfessionAreaSerializer()
 
     class Meta:
         model = Skill

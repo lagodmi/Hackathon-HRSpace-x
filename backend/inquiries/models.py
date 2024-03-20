@@ -52,7 +52,7 @@ class ProfessionArea(models.Model):
 
 class Duty(models.Model):
     name = models.CharField('Обязанность', max_length=256)
-    profession = models.ForeignKey('Profession',
+    profession = models.ForeignKey(ProfessionArea,
                                    on_delete=models.CASCADE,
                                    related_name='duties',
                                    verbose_name='профессия')
@@ -71,7 +71,7 @@ class Skill(models.Model):
         Модель навыка.
     """
     name = models.CharField(verbose_name='Навык', max_length=256)
-    profession = models.ForeignKey('Profession',
+    profession = models.ForeignKey(ProfessionArea,
                                    on_delete=models.CASCADE,
                                    related_name='skills',
                                    verbose_name='профессия')
