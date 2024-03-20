@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from inquiries.constants import MIN_EMPLOYEE_REWARD
 
-
 from inquiries.models import (
     City,
     Company,
@@ -13,8 +12,8 @@ from inquiries.models import (
     Profession,
     ProfessionArea,
     Recruiter,
-    Skill,
     SkillRecruiter,
+    Software,
     SocialPackage,
     TaskAdditional,
     TaskRecruiter,
@@ -106,22 +105,21 @@ class DutySerializer(serializers.ModelSerializer):
     """
         Сериализатор для модели обязанности.
     """
-    profession = ProfessionAreaSerializer()
+    prof_area = ProfessionAreaSerializer()
 
     class Meta:
         model = Duty
-        fields = ('id', 'name', 'profession')
+        fields = ('id', 'name', 'prof_area')
 
 
-class SkillSerializer(serializers.ModelSerializer):
+class SoftwareSerializer(serializers.ModelSerializer):
     """
         Сериализатор для модели навыка.
     """
-    profession = ProfessionAreaSerializer()
 
     class Meta:
-        model = Skill
-        fields = ('id', 'name', 'profession')
+        model = Software
+        fields = "__all__"
 
 
 class ConditionsSerializer(serializers.ModelSerializer):
@@ -176,7 +174,7 @@ class InquirySerializer(serializers.ModelSerializer):
     """
     prof = ProfessionSerializer()
     employeeResponsibilities = DutySerializer(many=True)
-    softwareSkills = SkillSerializer(many=True)
+    softwareSkills = SoftwareSerializer(many=True)
     city = CitySerializer()
     description = DescriptionSerializer()
     conditions = ConditionsSerializer()

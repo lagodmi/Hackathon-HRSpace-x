@@ -36,10 +36,10 @@ class City(models.Model):
 
 class ProfessionArea(models.Model):
     """
-        Модель Профессиональной области.
+        Модель профессиональной области.
     """
     name = models.CharField(verbose_name='профессиональная область',
-                            max_length=100)
+                            max_length=256)
 
     class Meta:
         verbose_name = 'Профессиональная область'
@@ -51,11 +51,14 @@ class ProfessionArea(models.Model):
 
 
 class Duty(models.Model):
-    name = models.CharField('Обязанность', max_length=256)
-    profession = models.ForeignKey(ProfessionArea,
-                                   on_delete=models.CASCADE,
-                                   related_name='duties',
-                                   verbose_name='профессия')
+    """
+        Модель обязанности.
+    """
+    name = models.CharField(verbose_name='обязанность', max_length=256)
+    prof_area = models.ForeignKey(ProfessionArea,
+                                  on_delete=models.CASCADE,
+                                  related_name='duties',
+                                  verbose_name='проф область')
 
     class Meta:
         verbose_name = 'Обязанность'
@@ -66,19 +69,15 @@ class Duty(models.Model):
         return self.name
 
 
-class Skill(models.Model):
+class Software(models.Model):
     """
-        Модель навыка.
+        Модель программы.
     """
-    name = models.CharField(verbose_name='Навык', max_length=256)
-    profession = models.ForeignKey(ProfessionArea,
-                                   on_delete=models.CASCADE,
-                                   related_name='skills',
-                                   verbose_name='профессия')
+    name = models.CharField(verbose_name='программа', max_length=256)
 
     class Meta:
-        verbose_name = 'Навык'
-        verbose_name_plural = 'Навыки'
+        verbose_name = 'Программа'
+        verbose_name_plural = 'Программы'
         ordering = ('name',)
 
     def __str__(self):
@@ -141,15 +140,15 @@ class Conditions(models.Model):
     """
         Модель условия работы.
     """
-    workSchedule = models.TextField(verbose_name='График работы',
+    workSchedule = models.TextField(verbose_name='график работы',
                                     choices=SCHEDULE)
-    workFormat = models.TextField(verbose_name='Формат работы',
+    workFormat = models.TextField(verbose_name='формат работы',
                                   choices=EMPLOYMENT_TYPE)
-    contractType = models.TextField('verbose_name=Способ оформления',
+    contractType = models.TextField('verbose_name=способ оформления',
                                     choices=EMPLOYMENT_METHOD)
     socialPackage = models.ManyToManyField(SocialPackage,
                                            related_name='social_package',
-                                           verbose_name='Социальный пакет')
+                                           verbose_name='социальный пакет')
 
     class Meta:
         verbose_name = 'Условия работы'
@@ -196,7 +195,7 @@ class Partnership(models.Model):
         verbose_name='дата выхода на работу',
         validators=(validate_desiredEmployeeExitDate_date,)
     )
-    resumeFormat = models.TextField(verbose_name='Вид резюме',
+    resumeFormat = models.TextField(verbose_name='вид резюме',
                                     choices=RESUME_OPTIONS)
 
     class Meta:
@@ -244,7 +243,7 @@ class SkillRecruiter(models.Model):
 
     class Meta:
         verbose_name = 'Навык рекрутера'
-        verbose_name_plural = 'навыки рекрутера'
+        verbose_name_plural = 'Навыки рекрутера'
         ordering = ('name',)
 
     def __str__(self):
@@ -280,7 +279,7 @@ class Inquiry(models.Model):
     """
         Модель заявки.
     """
-    name = models.CharField('название', max_length=128)
+    name = models.CharField(verbose_name='название', max_length=128)
     prof = models.ForeignKey(Profession, on_delete=models.CASCADE,
                              related_name='prof', verbose_name='профессия')
     employeeResponsibilities = models.ManyToManyField(
@@ -288,10 +287,10 @@ class Inquiry(models.Model):
         related_name='duty',
         verbose_name='обязанности'
     )
-    softwareSkills = models.ManyToManyField(Skill,
+    softwareSkills = models.ManyToManyField(Software,
                                             related_name='skill_software',
-                                            verbose_name='Навыки',
-                                            null=True, blank=True)
+                                            verbose_name='знание программ',
+                                            blank=True)
 
     city = models.ForeignKey(City, on_delete=models.CASCADE,
                              related_name='city', verbose_name='город')
@@ -315,12 +314,6 @@ class Inquiry(models.Model):
             Подбор релевантных обязанностей.
         """
         return self.prof.duties.all()
-
-    def get_relevant_softwareSkills(self):
-        """
-            Подбор релевантных навыков.
-        """
-        return self.prof.skills.all()
 
     def clean(self):
         if self.salary_min and self.salary_max and \

@@ -4,12 +4,12 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 
 from .serializers import (InquirySerializer)
-from inquiries.models import (Inquiry,Skill,Duty)
+from inquiries.models import (Inquiry,Software,Duty)
 
 
 class InquiryViewSet(viewsets.ModelViewSet):
     """
-    Вьюсет для для заявок.
+        Вьюсет для для заявок.
     """
     queryset = Inquiry.objects.all()
     serializer_class = InquirySerializer
