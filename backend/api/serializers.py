@@ -1,6 +1,8 @@
 from rest_framework import serializers
-from inquiries.constants import MIN_EMPLOYEE_REWARD
+from django.core.exceptions import ValidationError
+from django.utils import timezone
 
+from inquiries.constants import MIN_EMPLOYEE_REWARD
 from inquiries.models import (
     City,
     Company,
@@ -149,10 +151,23 @@ class PartnershipSerializer(serializers.ModelSerializer):
     """
     recruiterTasks = TaskRecruiterSerializer(many=True)
     employeeReward = serializers.IntegerField(min_value=MIN_EMPLOYEE_REWARD)
+    desiredFirstResumeDate = serializers.DateField()
+    desiredEmployeeExitDate = serializers.DateField()
 
     class Meta:
         model = Partnership
         fields = "__all__"
+
+    def validate(self, data):
+        if data['desiredFirstResumeDate'] <= timezone.now().date():
+            raise serializers.ValidationError(
+                {'desiredFirstResumeDate': 'Дата получения резюме не может'
+                                           'быть раньше сегодняшней даты.'})
+        if data['desiredFirstResumeDate'] > data['desiredEmployeeExitDate']:
+            raise serializers.ValidationError(
+                {'desiredEmployeeExitDate': 'Дата выхода на работу должна быть'
+                                            'позже даты получения резюме.'})
+        return data
 
 
 class RecruiterSerializer(serializers.ModelSerializer):
