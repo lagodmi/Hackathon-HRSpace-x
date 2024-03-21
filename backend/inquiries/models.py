@@ -205,7 +205,6 @@ class Partnership(models.Model):
         verbose_name_plural = 'Условия сотрудничества'
         ordering = ('pk',)
 
-
     def clean(self):
         if self.desiredEmployeeExitDate < timezone.now().date():
             raise ValidationError('Дата выхода на работу не может быть раньше сегодняшней даты.')
@@ -307,15 +306,19 @@ class Inquiry(models.Model):
     salary_min = models.IntegerField(verbose_name='зарплата от')
     salary_max = models.IntegerField(verbose_name='зарплата до')
     description = models.OneToOneField(Description,
+                                       related_name='description',
                                        on_delete=models.CASCADE,
                                        verbose_name='описание вакансии')
     conditions = models.OneToOneField(Conditions,
+                                      related_name='conditions',
                                       on_delete=models.CASCADE,
                                       verbose_name='условия работы')
     partnership = models.OneToOneField(Partnership,
+                                       related_name='partnership',
                                        on_delete=models.CASCADE,
                                        verbose_name='условия сотрудничества')
     recruiter = models.OneToOneField(Recruiter,
+                                     related_name='recruiter',
                                      on_delete=models.CASCADE,
                                      verbose_name='требования к рекрутерам')
 

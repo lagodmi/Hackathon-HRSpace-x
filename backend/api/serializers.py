@@ -2,7 +2,6 @@ from rest_framework import serializers
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
-from inquiries.constants import MIN_EMPLOYEE_REWARD
 from inquiries.models import (
     City,
     Company,
@@ -19,6 +18,12 @@ from inquiries.models import (
     SocialPackage,
     TaskAdditional,
     TaskRecruiter,
+)
+from inquiries.constants import (
+    EMPLOYMENT_METHOD,
+    MIN_EMPLOYEE_REWARD,
+    PAYMENT,
+    RESUME_OPTIONS,
 )
 
 
@@ -211,13 +216,6 @@ class ProfessionGetSerializer(serializers.ModelSerializer):
         fields = ('id', 'prof_area', 'prof_name')
 
 
-class SalarySerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Inquiry
-        fields = ('salary_min', 'salary_max')
-
-
 class InquiryGetSerializer(serializers.ModelSerializer):
     """
         Сериализатор для модели заявки.
@@ -225,13 +223,41 @@ class InquiryGetSerializer(serializers.ModelSerializer):
     prof = ProfessionGetSerializer()
     city = CitySerializer()
     salaryRange = serializers.SerializerMethodField()
-    # employeeResponsibilities = DutySerializer(many=True)
-    # softwareSkills = SoftwareSerializer(many=True)
-    
-    # description = DescriptionSerializer()
-    # conditions = ConditionsSerializer()
-    # partnership = PartnershipSerializer()
-    # recruiter = RecruiterSerializer()
+    employeeResponsibilities = serializers.SerializerMethodField()
+    education = serializers.SerializerMethodField(source='description')
+    experience = serializers.IntegerField(source='description.experience')
+    citizenship = serializers.SerializerMethodField(source='description')
+    softwareSkills = serializers.SerializerMethodField()
+    drivingLicense = serializers.BooleanField(
+        source='description.drivingLicense'
+    )
+    carOwnership = serializers.BooleanField(source='description.carOwnership')
+    workSchedule = serializers.SerializerMethodField(source='conditions')
+    workFormat = serializers.SerializerMethodField(source='conditions')
+    contractType = serializers.SerializerMethodField(source='conditions')
+    socialPackage = serializers.SerializerMethodField()
+    employeeReward = serializers.IntegerField(
+        source='partnership.employeeReward'
+    )
+    paymentType = serializers.SerializerMethodField(source='partnership')
+    employeeCount = serializers.IntegerField(
+        source='partnership.employeeCount'
+    )
+    recruiterTasks = serializers.SerializerMethodField()
+    resumeFormat = serializers.SerializerMethodField(source='partnership')
+    dates = serializers.SerializerMethodField()
+    experienceYears = serializers.IntegerField(
+        source='recruiter.experienceYears'
+    )
+    specialSkills = serializers.SerializerMethodField(source='recruiter')
+    additionalTasks = serializers.SerializerMethodField(source='recruiter')
+    isIndividual = serializers.BooleanField(source='recruiter.isIndividual')
+    blacklistedCompanies = serializers.SerializerMethodField(
+        source='recruiter'
+    )
+    recruiterCount = serializers.IntegerField(
+        source='recruiter.recruiterCount'
+    )
 
     def get_salaryRange(self, obj):
         return {
@@ -239,18 +265,82 @@ class InquiryGetSerializer(serializers.ModelSerializer):
             'salary_max': obj.salary_max
         }
 
+    def get_employeeResponsibilities(self, obj):
+        return [duty.name for duty in obj.employeeResponsibilities.all()]
+
+    def get_education(self, obj):
+        return obj.description.get_education_display()
+
+    def get_citizenship(self, obj):
+        return obj.description.get_citizenship_display()
+
+    def get_softwareSkills(self, obj):
+        return [duty.name for duty in obj.softwareSkills.all()]
+
+    def get_workSchedule(self, obj):
+        return obj.conditions.get_workSchedule_display()
+
+    def get_workFormat(self, obj):
+        return obj.conditions.get_workFormat_display()
+
+    def get_contractType(self, obj):
+        return obj.conditions.get_contractType_display()
+
+    def get_socialPackage(self, obj):
+        return [duty.name for duty in obj.conditions.socialPackage.all()]
+
+    def get_paymentType(self, obj):
+        return obj.partnership.get_paymentType_display()
+
+    def get_recruiterTasks(self, obj):
+        return [duty.name for duty in obj.partnership.recruiterTasks.all()]
+
+    def get_resumeFormat(self, obj):
+        return obj.partnership.get_resumeFormat_display()
+
+    def get_dates(self, obj):
+        return {
+            'desiredFirstResumeDate': obj.partnership.desiredFirstResumeDate,
+            'desiredEmployeeExitDate': obj.partnership.desiredEmployeeExitDate
+        }
+
+    def get_specialSkills(self, obj):
+        return [duty.name for duty in obj.recruiter.specialSkills.all()]
+
+    def get_additionalTasks(self, obj):
+        return [duty.name for duty in obj.recruiter.additionalTasks.all()]
+
+    def get_blacklistedCompanies(self, obj):
+        return [duty.name for duty in obj.recruiter.blacklistedCompanies.all()]
+
     class Meta:
         model = Inquiry
         fields = (
             'name',
             'prof',
             'city',
-            'salaryRange'
-            # 'employeeResponsibilities',
-            # 'softwareSkills',
-            
-            # 'description',
-            # 'conditions',
-            # 'partnership',
-            # 'recruiter',
+            'salaryRange',
+            'employeeResponsibilities',
+            'education',
+            'experience',
+            'citizenship',
+            'softwareSkills',
+            'drivingLicense',
+            'carOwnership',
+            'workSchedule',
+            'workFormat',
+            'contractType',
+            'socialPackage',
+            'employeeReward',
+            'paymentType',
+            'employeeCount',
+            'recruiterTasks',
+            'resumeFormat',
+            'dates',
+            'experienceYears',
+            'specialSkills',
+            'additionalTasks',
+            'isIndividual',
+            'blacklistedCompanies',
+            'recruiterCount'
         )
