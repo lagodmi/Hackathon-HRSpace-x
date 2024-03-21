@@ -199,3 +199,58 @@ class InquirySerializer(serializers.ModelSerializer):
     class Meta:
         model = Inquiry
         fields = "__all__"
+
+# Сериализаторы на GET запросы.
+
+
+class ProfessionGetSerializer(serializers.ModelSerializer):
+    prof_area = serializers.CharField(source='prof_area.name')
+
+    class Meta:
+        model = Profession
+        fields = ('id', 'prof_area', 'prof_name')
+
+
+class SalarySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Inquiry
+        fields = ('salary_min', 'salary_max')
+
+
+class InquiryGetSerializer(serializers.ModelSerializer):
+    """
+        Сериализатор для модели заявки.
+    """
+    prof = ProfessionGetSerializer()
+    city = CitySerializer()
+    salaryRange = serializers.SerializerMethodField()
+    # employeeResponsibilities = DutySerializer(many=True)
+    # softwareSkills = SoftwareSerializer(many=True)
+    
+    # description = DescriptionSerializer()
+    # conditions = ConditionsSerializer()
+    # partnership = PartnershipSerializer()
+    # recruiter = RecruiterSerializer()
+
+    def get_salaryRange(self, obj):
+        return {
+            'salary_min': obj.salary_min,
+            'salary_max': obj.salary_max
+        }
+
+    class Meta:
+        model = Inquiry
+        fields = (
+            'name',
+            'prof',
+            'city',
+            'salaryRange'
+            # 'employeeResponsibilities',
+            # 'softwareSkills',
+            
+            # 'description',
+            # 'conditions',
+            # 'partnership',
+            # 'recruiter',
+        )

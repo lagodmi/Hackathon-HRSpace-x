@@ -18,6 +18,7 @@ from .validators import (
 )
 from django.utils import timezone
 
+
 class City(models.Model):
     """
         Модель города.
@@ -57,7 +58,7 @@ class Duty(models.Model):
     name = models.CharField(verbose_name='обязанность', max_length=256)
     prof_area = models.ForeignKey(ProfessionArea,
                                   on_delete=models.CASCADE,
-                                  related_name='duties',
+                                  related_name='duty_prof_area',
                                   verbose_name='проф область')
 
     class Meta:
@@ -90,6 +91,7 @@ class Profession(models.Model):
     """
     id = models.IntegerField(primary_key=True)
     prof_area = models.ForeignKey(ProfessionArea,
+                                  related_name='prof_area',
                                   verbose_name='профессиональная область',
                                   on_delete=models.CASCADE)
     prof_name = models.CharField(verbose_name='профессия',

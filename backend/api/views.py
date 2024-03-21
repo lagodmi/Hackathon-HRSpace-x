@@ -7,7 +7,9 @@ from .serializers import (
     CitySerializer,
     InquirySerializer,
     ProfessionAreaSerializer,
-    ProfessionSerializer
+    ProfessionSerializer,
+    ProfessionGetSerializer,
+    InquiryGetSerializer
 )
 from inquiries.models import (
     Duty,
@@ -29,11 +31,16 @@ class InquiryViewSet(viewsets.ModelViewSet):
         Вьюсет для заявок.
     """
     queryset = Inquiry.objects.all()
-    serializer_class = InquirySerializer
+    # serializer_class = InquirySerializer
     # pagination_class = CustomPaginator
     # permission_classes = (IsAuthorStaffOrReadOnly,)
     # filter_backends = (DjangoFilterBackend, )
     # filterset_class = RecipeFilter
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return InquiryGetSerializer
+        return InquirySerializer
 
     def create(self, request):
         # Блок профессия.
