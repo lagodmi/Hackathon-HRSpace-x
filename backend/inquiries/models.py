@@ -18,6 +18,7 @@ from .validators import (
 )
 from django.utils import timezone
 
+
 class City(models.Model):
     """
         Модель города.
@@ -57,7 +58,7 @@ class Duty(models.Model):
     name = models.CharField(verbose_name='обязанность', max_length=256)
     prof_area = models.ForeignKey(ProfessionArea,
                                   on_delete=models.CASCADE,
-                                  related_name='duties',
+                                  related_name='duty_prof_area',
                                   verbose_name='проф область')
 
     class Meta:
@@ -90,6 +91,7 @@ class Profession(models.Model):
     """
     id = models.IntegerField(primary_key=True)
     prof_area = models.ForeignKey(ProfessionArea,
+                                  related_name='prof_area',
                                   verbose_name='профессиональная область',
                                   on_delete=models.CASCADE)
     prof_name = models.CharField(verbose_name='профессия',
@@ -203,7 +205,6 @@ class Partnership(models.Model):
         verbose_name_plural = 'Условия сотрудничества'
         ordering = ('pk',)
 
-
     def clean(self):
         if self.desiredEmployeeExitDate < timezone.now().date():
             raise ValidationError('Дата выхода на работу не может быть раньше сегодняшней даты.')
@@ -305,15 +306,19 @@ class Inquiry(models.Model):
     salary_min = models.IntegerField(verbose_name='зарплата от')
     salary_max = models.IntegerField(verbose_name='зарплата до')
     description = models.OneToOneField(Description,
+                                       related_name='description',
                                        on_delete=models.CASCADE,
                                        verbose_name='описание вакансии')
     conditions = models.OneToOneField(Conditions,
+                                      related_name='conditions',
                                       on_delete=models.CASCADE,
                                       verbose_name='условия работы')
     partnership = models.OneToOneField(Partnership,
+                                       related_name='partnership',
                                        on_delete=models.CASCADE,
                                        verbose_name='условия сотрудничества')
     recruiter = models.OneToOneField(Recruiter,
+                                     related_name='recruiter',
                                      on_delete=models.CASCADE,
                                      verbose_name='требования к рекрутерам')
 
