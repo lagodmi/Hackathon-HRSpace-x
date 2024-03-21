@@ -16,7 +16,7 @@ from .validators import (
     validate_desiredEmployeeExitDate_date,
     validate_desiredFirstResumeDate_date
 )
-
+from django.utils import timezone
 
 class City(models.Model):
     """
@@ -144,7 +144,7 @@ class Conditions(models.Model):
                                     choices=SCHEDULE)
     workFormat = models.TextField(verbose_name='формат работы',
                                   choices=EMPLOYMENT_TYPE)
-    contractType = models.TextField('verbose_name=способ оформления',
+    contractType = models.TextField(verbose_name='способ оформления',
                                     choices=EMPLOYMENT_METHOD)
     socialPackage = models.ManyToManyField(SocialPackage,
                                            related_name='social_package',
@@ -189,11 +189,11 @@ class Partnership(models.Model):
                                             verbose_name='задачи рекрутера')
     desiredFirstResumeDate = models.DateField(
         verbose_name='дата получения резюме',
-        validators=(validate_desiredFirstResumeDate_date,)
+        # validators=(validate_desiredFirstResumeDate_date,)
     )
     desiredEmployeeExitDate = models.DateField(
         verbose_name='дата выхода на работу',
-        validators=(validate_desiredEmployeeExitDate_date,)
+        # validators=(validate_desiredEmployeeExitDate_date,)
     )
     resumeFormat = models.TextField(verbose_name='вид резюме',
                                     choices=RESUME_OPTIONS)
@@ -202,6 +202,14 @@ class Partnership(models.Model):
         verbose_name = 'Условия сотрудничества'
         verbose_name_plural = 'Условия сотрудничества'
         ordering = ('pk',)
+
+
+    def clean(self):
+        if self.desiredEmployeeExitDate < timezone.now().date():
+            raise ValidationError('Дата выхода на работу не может быть раньше сегодняшней даты.')
+        
+        if self.desiredEmployeeExitDate < self.desiredFirstResumeDate:
+            raise ValidationError('Дата выхода на работу не может быть меньше даты получения резюме.')
 
 
 class Company(models.Model):
