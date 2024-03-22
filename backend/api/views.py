@@ -1,7 +1,19 @@
+from datetime import datetime, timezone
 from rest_framework import status, viewsets, filters
 from rest_framework import permissions
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+
+from inquiries.constants import (
+    CITIZENSHIP,
+    EDUCATION,
+    EMPLOYMENT_METHOD,
+    EMPLOYMENT_TYPE,
+    MIN_EMPLOYEE_REWARD,
+    RESUME_OPTIONS,
+    SCHEDULE,
+    PAYMENT
+)
 
 from .serializers import (
     CitySerializer,
@@ -30,6 +42,70 @@ from inquiries.models import (
     TaskAdditional,
     TaskRecruiter,
 )
+
+
+def get_education_key(value):
+    for key, label in EDUCATION:
+        if label == value:
+            return key
+    return None
+
+
+def get_citizenship_key(value):
+    for key, label in CITIZENSHIP:
+        if label == value:
+            return key
+    return None
+
+
+def get_workSchedule_key(value):
+    for key, label in SCHEDULE:
+        if label == value:
+            return key
+    return None
+
+
+def get_workFormat_key(value):
+    for key, label in EMPLOYMENT_TYPE:
+        if label == value:
+            return key
+    return None
+
+
+def get_contractType_key(value):
+    for key, label in EMPLOYMENT_METHOD:
+        if label == value:
+            return key
+    return None
+
+
+def get_paymentType_key(value):
+    for key, label in PAYMENT:
+        if label == value:
+            return key
+    return None
+
+
+def get_resumeFormat_key(value):
+    for key, label in RESUME_OPTIONS:
+        if label == value:
+            return key
+    return None
+
+
+def get_socialPackage_con(values: list[str]) -> list[dict]:
+    return [{'name': value} for value in values]
+
+
+def convert_timestamp_to_datetime(timestamp):
+    try:
+        # Перевод числового значения временной метки в объект даты и времени с указанием UTC
+        converted_datetime = datetime.fromtimestamp(timestamp / 1000,
+                                                    tz=timezone.utc).date()
+        return converted_datetime
+    except Exception as e:
+        print(f"Ошибка при конвертации временной метки: {e}")
+        return None
 
 
 class InquiryViewSet(viewsets.ModelViewSet):
@@ -66,8 +142,10 @@ class InquiryViewSet(viewsets.ModelViewSet):
             if profession_serializer.is_valid():
                 profession = profession_serializer.save()
             else:
-                return Response(profession_serializer.errors,
-                                status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {'message': 'Ошибка при создании объекта профессия.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
         # Блок город.
         city_data = request.data['city']
@@ -79,54 +157,67 @@ class InquiryViewSet(viewsets.ModelViewSet):
             if city_serializer.is_valid():
                 city = city_serializer.save()
             else:
-                return Response(city_serializer.errors,
-                                status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {'message': 'Ошибка при создании объекта город.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
         # Описание.
         desc_data = {
-            'education': request.data['education'],
+            'education': get_education_key(request.data['education']),
             'experience': request.data['experience'],
-            'citizenship': request.data['citizenship'],
+            'citizenship': get_citizenship_key(request.data['citizenship']),
             'drivingLicense': request.data['drivingLicense'],
             'carOwnership': request.data['carOwnership']
         }
 
         desc_serializer = DescriptionSerializer(data=desc_data)
         if desc_serializer.is_valid():
-            desc = desc_serializer.instance
+            desc = desc_serializer.save()
         else:
-            return Response(desc_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'message': 'Ошибка при создании описания.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         # Условия работы.
         cond_data = {
-            'workSchedule': request.data['workSchedule'],
-            'workFormat': request.data['workFormat'],
-            'contractType': request.data['contractType'],
-            'socialPackage': request.data['socialPackage']
+            'workSchedule': get_workSchedule_key(request.data['workSchedule']),
+            'workFormat': get_workFormat_key(request.data['workFormat']),
+            'contractType': get_contractType_key(request.data['contractType']),
+            'socialPackage': get_socialPackage_con(request.data['socialPackage'])
         }
 
         cond_serializer = ConditionsSerializer(data=cond_data)
         if cond_serializer.is_valid():
-            conditions = desc_serializer.instance
+            conditions = desc_serializer.save()
         else:
-            return Response(cond_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'message': 'Ошибка при создании условия работы.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         # Условия сотрудничества.
         partnership_data = {
             'employeeReward': request.data['employeeReward'],
-            'paymentType': request.data['paymentType'],
+            'paymentType': get_paymentType_key(request.data['paymentType']),
             'employeeCount': request.data['employeeCount'],
             'recruiterTasks': request.data['recruiterTasks'],
-            'desiredFirstResumeDate': request.data['desiredFirstResumeDate'],
-            'desiredEmployeeExitDate': request.data['desiredEmployeeExitDate'],
-            'resumeFormat': request.data['resumeFormat']
+            'desiredFirstResumeDate': convert_timestamp_to_datetime(
+                request.data['dates']['desiredFirstResumeDate']),
+            'desiredEmployeeExitDate': convert_timestamp_to_datetime(
+                request.data['dates']['desiredEmployeeExitDate']),
+            'resumeFormat': get_resumeFormat_key(request.data['resumeFormat'])
         }
 
         partnership_serializer = PartnershipSerializer(data=partnership_data)
         if partnership_serializer.is_valid():
-            partnership = desc_serializer.instance
+            partnership = desc_serializer.save()
         else:
-            return Response(cond_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'message': 'Ошибка при создании условия сотрудничества.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         # Требование к рекрутерам.
         recruiter_data = {
@@ -140,9 +231,12 @@ class InquiryViewSet(viewsets.ModelViewSet):
 
         recruiter_serializer = RecruiterSerializer(data=recruiter_data)
         if recruiter_serializer.is_valid():
-            recruiter = desc_serializer.instance
+            recruiter = desc_serializer.save()
         else:
-            return Response(cond_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'message': 'Произошла ошибка при создании объекта рекрутер.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         # Привязка к модели Inquiry
         inquiry_data = {
@@ -162,6 +256,9 @@ class InquiryViewSet(viewsets.ModelViewSet):
         if inquiry_serializer.is_valid():
             inquiry = inquiry_serializer.save()
         else:
-            return Response(inquiry_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'message': 'Произошла ошибка при создании  заявки.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         return Response(InquirySerializer(inquiry).data)
