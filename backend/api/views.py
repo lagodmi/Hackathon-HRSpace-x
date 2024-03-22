@@ -3,6 +3,7 @@ from rest_framework import status, viewsets, filters
 from rest_framework import permissions
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import extend_schema_view, extend_schema
 
 from inquiries.constants import (
     CITIZENSHIP,
@@ -41,6 +42,14 @@ from inquiries.models import (
     SocialPackage,
     TaskAdditional,
     TaskRecruiter,
+)
+
+from .swagger import (
+    inquiry_list_schema,
+    inquiry_update_schema,
+    inquiry_create_schema,
+    inquiry_retrieve_schema,
+    inquiry_delete_schema,
 )
 
 
@@ -106,6 +115,15 @@ def convert_timestamp_to_datetime(timestamp):
     except Exception as e:
         print(f"Ошибка при конвертации временной метки: {e}")
         return None
+
+ 
+@extend_schema(tags=["Inquiries"])
+@extend_schema_view(
+    list=inquiry_list_schema,
+    update=inquiry_update_schema,
+    create=inquiry_create_schema,
+    retrieve=inquiry_retrieve_schema,
+    delete=inquiry_delete_schema,)
 
 
 class InquiryViewSet(viewsets.ModelViewSet):
