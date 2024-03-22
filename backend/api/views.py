@@ -6,7 +6,11 @@ from drf_spectacular.utils import extend_schema_view, extend_schema
 
 from .serializers import (
     CitySerializer,
+    ConditionsSerializer,
+    DescriptionSerializer,
+    DutySerializer,
     InquirySerializer,
+    PartnershipSerializer,
     ProfessionAreaSerializer,
     ProfessionSerializer,
     ProfessionGetSerializer,
@@ -17,6 +21,7 @@ from .serializers import (
     RecruiterSerializer,
 )
 from inquiries.models import (
+    Description,
     Duty,
     City,
     Company,
@@ -107,7 +112,7 @@ class InquiryViewSet(viewsets.ModelViewSet):
 
         desc_serializer = DescriptionSerializer(data=desc_data)
         if desc_serializer.is_valid():
-            desc = desc_serializer.save()
+            desc = desc_serializer.instance
         else:
             return Response(desc_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -121,7 +126,7 @@ class InquiryViewSet(viewsets.ModelViewSet):
 
         cond_serializer = ConditionsSerializer(data=cond_data)
         if cond_serializer.is_valid():
-            conditions = cond_serializer.save()
+            conditions = desc_serializer.instance
         else:
             return Response(cond_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -138,7 +143,7 @@ class InquiryViewSet(viewsets.ModelViewSet):
 
         partnership_serializer = PartnershipSerializer(data=partnership_data)
         if partnership_serializer.is_valid():
-            partnership = partnership_serializer.save()
+            partnership = desc_serializer.instance
         else:
             return Response(cond_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -154,7 +159,7 @@ class InquiryViewSet(viewsets.ModelViewSet):
 
         recruiter_serializer = RecruiterSerializer(data=recruiter_data)
         if recruiter_serializer.is_valid():
-            recruiter = recruiter_serializer.save()
+            recruiter = desc_serializer.instance
         else:
             return Response(cond_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
