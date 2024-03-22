@@ -26,7 +26,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'inquiries.apps.InquiriesConfig',
-    'api.apps.ApiConfig'
+    'api.apps.ApiConfig',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -96,3 +97,17 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {        
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "HRSpace Inquiry API", # название проекта
+    "VERSION": "0.0.1", # версия проекта
+    "SERVE_INCLUDE_SCHEMA": False, # исключить эндпоинт /schema
+    "SWAGGER_UI_SETTINGS": {
+        "filter": True, # включить поиск по тегам
+    },
+    "COMPONENT_SPLIT_REQUEST": True
+}
