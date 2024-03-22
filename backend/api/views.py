@@ -6,13 +6,16 @@ from drf_spectacular.utils import extend_schema_view, extend_schema
 
 from .serializers import (
     CitySerializer,
+    ConditionsSerializer,
     DescriptionSerializer,
     DutySerializer,
     InquirySerializer,
+    PartnershipSerializer,
     ProfessionAreaSerializer,
     ProfessionSerializer,
     ProfessionGetSerializer,
-    InquiryGetSerializer
+    InquiryGetSerializer,
+    RecruiterSerializer
 )
 from inquiries.models import (
     Description,
@@ -106,7 +109,7 @@ class InquiryViewSet(viewsets.ModelViewSet):
 
         desc_serializer = DescriptionSerializer(data=desc_data)
         if desc_serializer.is_valid():
-            desc = desc_serializer.save()
+            desc = desc_serializer.instance
         else:
             return Response(desc_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -118,9 +121,9 @@ class InquiryViewSet(viewsets.ModelViewSet):
             'socialPackage': request.data['socialPackage']
         }
 
-        cond_serializer = DescriptionSerializer(data=cond_data)
+        cond_serializer = ConditionsSerializer(data=cond_data)
         if cond_serializer.is_valid():
-            conditions = desc_serializer.save()
+            conditions = desc_serializer.instance
         else:
             return Response(cond_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -135,9 +138,9 @@ class InquiryViewSet(viewsets.ModelViewSet):
             'resumeFormat': request.data['resumeFormat']
         }
 
-        partnership_serializer = DescriptionSerializer(data=partnership_data)
+        partnership_serializer = PartnershipSerializer(data=partnership_data)
         if partnership_serializer.is_valid():
-            partnership = desc_serializer.save()
+            partnership = desc_serializer.instance
         else:
             return Response(cond_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -151,9 +154,9 @@ class InquiryViewSet(viewsets.ModelViewSet):
             'recruiterCount': request.data['recruiterCount']
         }
 
-        recruiter_serializer = DescriptionSerializer(data=recruiter_data)
+        recruiter_serializer = RecruiterSerializer(data=recruiter_data)
         if recruiter_serializer.is_valid():
-            recruiter = desc_serializer.save()
+            recruiter = desc_serializer.instance
         else:
             return Response(cond_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
