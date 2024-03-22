@@ -102,7 +102,7 @@ def get_resumeFormat_key(value):
     return None
 
 
-def get_socialPackage_con(values: list[str]) -> list[dict]:
+def socialPackage_con(values: list[str]) -> list[dict]:
     return [{'name': value} for value in values]
 
 
@@ -203,7 +203,7 @@ class InquiryViewSet(viewsets.ModelViewSet):
             'workSchedule': get_workSchedule_key(request.data['workSchedule']),
             'workFormat': get_workFormat_key(request.data['workFormat']),
             'contractType': get_contractType_key(request.data['contractType']),
-            'socialPackage': get_socialPackage_con(request.data['socialPackage'])
+            'socialPackage': socialPackage_con(request.data['socialPackage'])
         }
 
         cond_serializer = ConditionsSerializer(data=cond_data)
@@ -216,26 +216,35 @@ class InquiryViewSet(viewsets.ModelViewSet):
             )
 
         # Условия сотрудничества.
+        desired_first_resume_date = convert_timestamp_to_datetime(request.data['dates']['desiredFirstResumeDate'])
+        desired_employee_exit_date = convert_timestamp_to_datetime(request.data['dates']['desiredEmployeeExitDate'])
+
+        if desired_first_resume_date and desired_employee_exit_date:
+            if desired_employee_exit_date <= desired_first_resume_date:
+                return Response(
+                    {'message': 'Дата выхода на работу должна быть позже даты получения резюме.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
         partnership_data = {
             'employeeReward': request.data['employeeReward'],
             'paymentType': get_paymentType_key(request.data['paymentType']),
             'employeeCount': request.data['employeeCount'],
             'recruiterTasks': request.data['recruiterTasks'],
-            'desiredFirstResumeDate': convert_timestamp_to_datetime(
-                request.data['dates']['desiredFirstResumeDate']),
-            'desiredEmployeeExitDate': convert_timestamp_to_datetime(
-                request.data['dates']['desiredEmployeeExitDate']),
+            'desiredFirstResumeDate': desired_first_resume_date,
+            'desiredEmployeeExitDate': desired_employee_exit_date,
             'resumeFormat': get_resumeFormat_key(request.data['resumeFormat'])
         }
 
         partnership_serializer = PartnershipSerializer(data=partnership_data)
         if partnership_serializer.is_valid():
-            partnership = desc_serializer.save()
+            partnership = partnership_serializer.save()
         else:
             return Response(
                 {'message': 'Ошибка при создании условия сотрудничества.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
 
         # Требование к рекрутерам.
         recruiter_data = {
