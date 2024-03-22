@@ -133,7 +133,8 @@ class ConditionsSerializer(serializers.ModelSerializer):
     """
         Сериализатор для модели условия работы.
     """
-    socialPackage = SocialPackageSerializer(many=True)
+    socialPackage = serializers.PrimaryKeyRelatedField(
+        queryset=SocialPackage.objects.all(), many=True)
 
     class Meta:
         model = Conditions
@@ -154,7 +155,8 @@ class PartnershipSerializer(serializers.ModelSerializer):
     """
         Сериализатор для модели условия сотрудничества.
     """
-    recruiterTasks = TaskRecruiterSerializer(many=True)
+    recruiterTasks = serializers.PrimaryKeyRelatedField(
+        queryset=TaskRecruiter.objects.all(), many=True)
     employeeReward = serializers.IntegerField(min_value=MIN_EMPLOYEE_REWARD)
     desiredFirstResumeDate = serializers.DateField(format="%d-%m-%Y")
     desiredEmployeeExitDate = serializers.DateField(format="%d-%m-%Y")
@@ -179,9 +181,12 @@ class RecruiterSerializer(serializers.ModelSerializer):
     """
         Сериализатор для модели требование к рекрутерам.
     """
-    specialSkills = SkillRecruiterSerializer()
-    additionalTasks = TaskAdditionalSerializer()
-    blacklistedCompanies = CompanySerializer()
+    specialSkills = serializers.PrimaryKeyRelatedField(
+        queryset=SkillRecruiter.objects.all(), many=True)
+    additionalTasks = serializers.PrimaryKeyRelatedField(
+        queryset=TaskAdditional.objects.all(), many=True)
+    blacklistedCompanies = serializers.PrimaryKeyRelatedField(
+        queryset=Company.objects.all(), many=True)
 
     class Meta:
         model = Recruiter
@@ -193,8 +198,10 @@ class InquirySerializer(serializers.ModelSerializer):
         Сериализатор для модели заявки.
     """
     prof = ProfessionSerializer()
-    employeeResponsibilities = DutySerializer(many=True)
-    softwareSkills = SoftwareSerializer(many=True)
+    employeeResponsibilities = serializers.PrimaryKeyRelatedField(
+        queryset=Duty.objects.all(), many=True)
+    softwareSkills = serializers.PrimaryKeyRelatedField(
+        queryset=Software.objects.all(), many=True)
     city = CitySerializer()
     description = DescriptionSerializer()
     conditions = ConditionsSerializer()

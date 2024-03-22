@@ -126,7 +126,7 @@ class InquiryViewSet(viewsets.ModelViewSet):
 
         cond_serializer = ConditionsSerializer(data=cond_data)
         if cond_serializer.is_valid():
-            conditions = desc_serializer.instance
+            conditions = cond_serializer.instance
         else:
             return Response(cond_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -136,16 +136,16 @@ class InquiryViewSet(viewsets.ModelViewSet):
             'paymentType': request.data['paymentType'],
             'employeeCount': request.data['employeeCount'],
             'recruiterTasks': request.data['recruiterTasks'],
-            'desiredFirstResumeDate': request.data['desiredFirstResumeDate'],
-            'desiredEmployeeExitDate': request.data['desiredEmployeeExitDate'],
+            'desiredFirstResumeDate': request.data['dates']['desiredFirstResumeDate'],
+            'desiredEmployeeExitDate': request.data['dates']['desiredEmployeeExitDate'],
             'resumeFormat': request.data['resumeFormat']
         }
 
         partnership_serializer = PartnershipSerializer(data=partnership_data)
         if partnership_serializer.is_valid():
-            partnership = desc_serializer.instance
+            partnership = partnership_serializer.instance
         else:
-            return Response(cond_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(partnership_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         # Требование к рекрутерам.
         recruiter_data = {
@@ -159,9 +159,9 @@ class InquiryViewSet(viewsets.ModelViewSet):
 
         recruiter_serializer = RecruiterSerializer(data=recruiter_data)
         if recruiter_serializer.is_valid():
-            recruiter = desc_serializer.instance
+            recruiter = recruiter_serializer.instance
         else:
-            return Response(cond_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(recruiter_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         # Привязка к модели Inquiry
         inquiry_data = {
