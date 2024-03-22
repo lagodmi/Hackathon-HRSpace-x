@@ -38,7 +38,7 @@ class InquiryViewSet(viewsets.ModelViewSet):
     # filterset_class = RecipeFilter
 
     def get_serializer_class(self):
-        if self.request.method == 'GET':
+        if self.request.method in permissions.SAFE_METHODS:
             return InquiryGetSerializer
         return InquirySerializer
 

@@ -156,8 +156,8 @@ class PartnershipSerializer(serializers.ModelSerializer):
     """
     recruiterTasks = TaskRecruiterSerializer(many=True)
     employeeReward = serializers.IntegerField(min_value=MIN_EMPLOYEE_REWARD)
-    desiredFirstResumeDate = serializers.DateField()
-    desiredEmployeeExitDate = serializers.DateField()
+    desiredFirstResumeDate = serializers.DateField(format="%d-%m-%Y")
+    desiredEmployeeExitDate = serializers.DateField(format="%d-%m-%Y")
 
     class Meta:
         model = Partnership
@@ -300,8 +300,8 @@ class InquiryGetSerializer(serializers.ModelSerializer):
 
     def get_dates(self, obj):
         return {
-            'desiredFirstResumeDate': obj.partnership.desiredFirstResumeDate,
-            'desiredEmployeeExitDate': obj.partnership.desiredEmployeeExitDate
+            'desiredFirstResumeDate': obj.partnership.desiredFirstResumeDate.strftime('%d-%m-%Y'),
+            'desiredEmployeeExitDate': obj.partnership.desiredEmployeeExitDate.strftime('%d-%m-%Y')
         }
 
     def get_specialSkills(self, obj):
