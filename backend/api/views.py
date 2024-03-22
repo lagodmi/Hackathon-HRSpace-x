@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 
 from .serializers import (
     CitySerializer,
+    DutySerializer,
     InquirySerializer,
     ProfessionAreaSerializer,
     ProfessionSerializer,
@@ -12,6 +13,7 @@ from .serializers import (
     InquiryGetSerializer
 )
 from inquiries.models import (
+    Description,
     Duty,
     City,
     Company,
@@ -44,8 +46,8 @@ class InquiryViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         # Блок профессия.
-        prof_data = request.data.get('prof')
-        prof_area_data = prof_data.pop('prof_area')
+        prof_data = request.data['prof']
+        prof_area_data = prof_data['prof_area']
         try:
             profession_area = ProfessionArea.objects.get(
                 name=prof_area_data
@@ -62,9 +64,12 @@ class InquiryViewSet(viewsets.ModelViewSet):
             else:
                 return Response(profession_serializer.errors,
                                 status=status.HTTP_400_BAD_REQUEST)
+            
+        # Описание.
+        description_data = 
 
         # Блок город.
-        city_data = request.data.get('city')
+        city_data = request.data['city']
         try:
             city = City.objects.get(id=city_data['id'],
                                     name=city_data['name'])
@@ -76,10 +81,30 @@ class InquiryViewSet(viewsets.ModelViewSet):
                 return Response(city_serializer.errors,
                                 status=status.HTTP_400_BAD_REQUEST)
 
+        inquiry_data = {
+            'name': request.data['name'],
+            'prof': profession,
+            'salary_min': request.data['salaryRange']['salary_min'],
+            'salary_max': request.data['salaryRange']['salary_max'],
+            'city': city,
+            'employeeResponsibilities': request.data['employeeResponsibilities']
+        }
 
+        inquiry_serializer = InquirySerializer(data=inquiry_data)
+        if inquiry_serializer.is_valid():
+            inquiry = inquiry_serializer.save()
+        else:
+            return Response(inquiry_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
+        return Response(InquirySerializer(inquiry).data)
 
         # Привязка к модели Inquiry
-        Inquiry.objects.create(prof=profession,
-                               city=city)
+        # inquiry = Inquiry.objects.create(
+        #     name=request.data['name'],
+        #     prof=profession,
+        #     salary_min=request.data['salaryRange']['salary_min'],
+        #     salary_max=request.data['salaryRange']['salary_max'],
+        #     employeeResponsibilities=request.data['employeeResponsibilities'],
+        #     city=city
+        # )
+        # inquiry.employeeResponsibilities.set(employee_responsibilities)
