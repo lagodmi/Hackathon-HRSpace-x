@@ -106,17 +106,6 @@ def socialPackage_con(values: list[str]) -> list[dict]:
     return [{'name': value} for value in values]
 
 
-def convert_timestamp_to_datetime(timestamp):
-    try:
-        # Перевод числового значения временной метки в объект даты и времени с указанием UTC
-        converted_datetime = datetime.fromtimestamp(timestamp / 1000,
-                                                    tz=timezone.utc).date()
-        return converted_datetime
-    except Exception as e:
-        print(f"Ошибка при конвертации временной метки: {e}")
-        return None
-
- 
 @extend_schema(tags=["Inquiries"])
 @extend_schema_view(
     list=inquiry_list_schema,
@@ -208,7 +197,7 @@ class InquiryViewSet(viewsets.ModelViewSet):
 
         cond_serializer = ConditionsSerializer(data=cond_data)
         if cond_serializer.is_valid():
-            conditions = desc_serializer.save()
+            conditions = cond_serializer.save()
         else:
             return Response(
                 {'message': 'Ошибка при создании условия работы.'},
@@ -216,8 +205,8 @@ class InquiryViewSet(viewsets.ModelViewSet):
             )
 
         # Условия сотрудничества.
-        desired_first_resume_date = convert_timestamp_to_datetime(request.data['dates']['desiredFirstResumeDate'])
-        desired_employee_exit_date = convert_timestamp_to_datetime(request.data['dates']['desiredEmployeeExitDate'])
+        desired_first_resume_date = request.data['dates']['desiredFirstResumeDate']
+        desired_employee_exit_date = request.data['dates']['desiredEmployeeExitDate']
 
         if desired_first_resume_date and desired_employee_exit_date:
             if desired_employee_exit_date <= desired_first_resume_date:
@@ -258,7 +247,7 @@ class InquiryViewSet(viewsets.ModelViewSet):
 
         recruiter_serializer = RecruiterSerializer(data=recruiter_data)
         if recruiter_serializer.is_valid():
-            recruiter = desc_serializer.save()
+            recruiter = recruiter_serializer.save()
         else:
             return Response(
                 {'message': 'Произошла ошибка при создании объекта рекрутер.'},
