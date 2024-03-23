@@ -212,6 +212,14 @@ class InquirySerializer(serializers.ModelSerializer):
         model = Inquiry
         fields = "__all__"
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if instance.prof:
+            prof_area = instance.prof.prof_area
+            duties = Duty.objects.filter(prof_area=prof_area)
+            data['employeeResponsibilities'] = [duty.id for duty in duties]
+        return data
+
 # Сериализаторы на GET запросы.
 
 

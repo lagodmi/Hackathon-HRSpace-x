@@ -2,6 +2,7 @@ from rest_framework import status, viewsets, filters
 from rest_framework import permissions
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema_view, extend_schema
 
 from .serializers import (
@@ -42,6 +43,8 @@ from .swagger import (
     inquiry_retrieve_schema,
     inquiry_delete_schema,
 )
+
+from .filters import DutyFilter
 
 
 @extend_schema(tags=["Inquiries"])
@@ -184,3 +187,11 @@ class InquiryViewSet(viewsets.ModelViewSet):
             return Response(inquiry_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(InquirySerializer(inquiry).data)
+
+
+class DutyViewSet(viewsets.ModelViewSet):
+    """Вьюсет для ингридиентов. Подключение фильтра для поиска по названию"""
+    serializer_class = DutySerializer
+    queryset = Duty.objects.all()
+    filter_backends = (DjangoFilterBackend, )
+    filterset_class = DutyFilter
