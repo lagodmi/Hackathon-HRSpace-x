@@ -36,7 +36,10 @@ from .serializers import (
 from inquiries.models import (
     Description,
     Duty,
+    Conditions,
     City,
+    Partnership,
+    Recruiter,
     Company,
     Inquiry,
     Profession,
@@ -146,153 +149,153 @@ class InquiryViewSet(viewsets.ModelViewSet):
             return InquiryGetSerializer
         return InquirySerializer
 
-    def create(self, request):
-        # Блок профессия.
-        prof_data = request.data['prof']
-        prof_area_data = prof_data['prof_area']
-        try:
-            profession_area = ProfessionArea.objects.get(
-                name=prof_area_data
-            )
-            profession = Profession.objects.get(
-                id=prof_data['id'],
-                prof_area=profession_area,
-                prof_name=prof_data['prof_name']
-            )
-        except Profession.DoesNotExist:
-            profession_serializer = ProfessionSerializer(data=prof_data)
-            if profession_serializer.is_valid():
-                profession = profession_serializer.save()
-            else:
-                return Response(
-                    {'message': 'Ошибка при создании объекта профессия.'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+    # def create(self, request):
+    #     # Блок профессия.
+    #     prof_data = request.data['prof']
+    #     prof_area_data = prof_data['prof_area']
+    #     try:
+    #         profession_area = ProfessionArea.objects.get(
+    #             name=prof_area_data
+    #         )
+    #         profession = Profession.objects.get(
+    #             id=prof_data['id'],
+    #             prof_area=profession_area,
+    #             prof_name=prof_data['prof_name']
+    #         )
+    #     except Profession.DoesNotExist:
+    #         profession_serializer = ProfessionSerializer(data=prof_data)
+    #         if profession_serializer.is_valid():
+    #             profession = profession_serializer.save()
+    #         else:
+    #             return Response(
+    #                 {'message': 'Ошибка при создании объекта профессия.'},
+    #                 status=status.HTTP_400_BAD_REQUEST
+    #             )
 
-        # Блок город.
-        city_data = request.data['city']
-        try:
-            city = City.objects.get(id=city_data['id'],
-                                    name=city_data['name'])
-        except City.DoesNotExist:
-            city_serializer = CitySerializer(data=city_data)
-            if city_serializer.is_valid():
-                city = city_serializer.save()
-            else:
-                return Response(
-                    {'message': 'Ошибка при создании объекта город.'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+    #     # Блок город.
+    #     city_data = request.data['city']
+    #     try:
+    #         city = City.objects.get(id=city_data['id'],
+    #                                 name=city_data['name'])
+    #     except City.DoesNotExist:
+    #         city_serializer = CitySerializer(data=city_data)
+    #         if city_serializer.is_valid():
+    #             city = city_serializer.save()
+    #         else:
+    #             return Response(
+    #                 {'message': 'Ошибка при создании объекта город.'},
+    #                 status=status.HTTP_400_BAD_REQUEST
+    #             )
 
-        # Описание.
-        desc_data = {
-            'education': get_education_key(request.data['education']),
-            'experience': request.data['experience'],
-            'citizenship': get_citizenship_key(request.data['citizenship']),
-            'drivingLicense': request.data['drivingLicense'],
-            'carOwnership': request.data['carOwnership']
-        }
+        # # Описание.
+        # desc_data = {
+        #     'education': get_education_key(request.data['education']),
+        #     'experience': request.data['experience'],
+        #     'citizenship': get_citizenship_key(request.data['citizenship']),
+        #     'drivingLicense': request.data['drivingLicense'],
+        #     'carOwnership': request.data['carOwnership']
+        # }
 
-        desc_serializer = DescriptionSerializer(data=desc_data)
-        if desc_serializer.is_valid():
-            desc = desc_serializer.save()
-        else:
-            return Response(
-                {'message': 'Ошибка при создании описания.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        # desc_serializer = DescriptionSerializer(data=desc_data)
+        # if desc_serializer.is_valid():
+        #     desc = desc_serializer.save()
+        # else:
+        #     return Response(
+        #         {'message': 'Ошибка при создании описания.'},
+        #         status=status.HTTP_400_BAD_REQUEST
+        #     )
 
-        # Условия работы.
-        cond_data = {
-            'workSchedule': get_workSchedule_key(request.data['workSchedule']),
-            'workFormat': get_workFormat_key(request.data['workFormat']),
-            'contractType': get_contractType_key(request.data['contractType']),
-            'socialPackage': socialPackage_con(request.data['socialPackage'])
-        }
+        # # Условия работы.
+        # cond_data = {
+        #     'workSchedule': get_workSchedule_key(request.data['workSchedule']),
+        #     'workFormat': get_workFormat_key(request.data['workFormat']),
+        #     'contractType': get_contractType_key(request.data['contractType']),
+        #     'socialPackage': socialPackage_con(request.data['socialPackage'])
+        # }
 
-        cond_serializer = ConditionsSerializer(data=cond_data)
-        if cond_serializer.is_valid():
-            conditions = desc_serializer.save()
-        else:
-            return Response(
-                {'message': 'Ошибка при создании условия работы.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        # cond_serializer = ConditionsSerializer(data=cond_data)
+        # if cond_serializer.is_valid():
+        #     conditions = desc_serializer.save()
+        # else:
+        #     return Response(
+        #         {'message': 'Ошибка при создании условия работы.'},
+        #         status=status.HTTP_400_BAD_REQUEST
+        #     )
 
-        # Условия сотрудничества.
-        desired_first_resume_date = convert_timestamp_to_datetime(request.data['dates']['desiredFirstResumeDate'])
-        desired_employee_exit_date = convert_timestamp_to_datetime(request.data['dates']['desiredEmployeeExitDate'])
+        # # Условия сотрудничества.
+        # desired_first_resume_date = convert_timestamp_to_datetime(request.data['dates']['desiredFirstResumeDate'])
+        # desired_employee_exit_date = convert_timestamp_to_datetime(request.data['dates']['desiredEmployeeExitDate'])
 
-        if desired_first_resume_date and desired_employee_exit_date:
-            if desired_employee_exit_date <= desired_first_resume_date:
-                return Response(
-                    {'message': 'Дата выхода на работу должна быть позже даты получения резюме.'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+        # if desired_first_resume_date and desired_employee_exit_date:
+        #     if desired_employee_exit_date <= desired_first_resume_date:
+        #         return Response(
+        #             {'message': 'Дата выхода на работу должна быть позже даты получения резюме.'},
+        #             status=status.HTTP_400_BAD_REQUEST
+        #         )
 
-        partnership_data = {
-            'employeeReward': request.data['employeeReward'],
-            'paymentType': get_paymentType_key(request.data['paymentType']),
-            'employeeCount': request.data['employeeCount'],
-            'recruiterTasks': request.data['recruiterTasks'],
-            'desiredFirstResumeDate': desired_first_resume_date,
-            'desiredEmployeeExitDate': desired_employee_exit_date,
-            'resumeFormat': get_resumeFormat_key(request.data['resumeFormat'])
-        }
+        # partnership_data = {
+        #     'employeeReward': request.data['employeeReward'],
+        #     'paymentType': get_paymentType_key(request.data['paymentType']),
+        #     'employeeCount': request.data['employeeCount'],
+        #     'recruiterTasks': request.data['recruiterTasks'],
+        #     'desiredFirstResumeDate': desired_first_resume_date,
+        #     'desiredEmployeeExitDate': desired_employee_exit_date,
+        #     'resumeFormat': get_resumeFormat_key(request.data['resumeFormat'])
+        # }
 
-        partnership_serializer = PartnershipSerializer(data=partnership_data)
-        if partnership_serializer.is_valid():
-            partnership = partnership_serializer.save()
-        else:
-            return Response(
-                {'message': 'Ошибка при создании условия сотрудничества.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        # partnership_serializer = PartnershipSerializer(data=partnership_data)
+        # if partnership_serializer.is_valid():
+        #     partnership = partnership_serializer.save()
+        # else:
+        #     return Response(
+        #         {'message': 'Ошибка при создании условия сотрудничества.'},
+        #         status=status.HTTP_400_BAD_REQUEST
+        #     )
 
 
-        # Требование к рекрутерам.
-        recruiter_data = {
-            'experienceYears': request.data['experienceYears'],
-            'specialSkills': request.data['specialSkills'],
-            'additionalTasks': request.data['additionalTasks'],
-            'isIndividual': request.data['isIndividual'],
-            'blacklistedCompanies': request.data['blacklistedCompanies'],
-            'recruiterCount': request.data['recruiterCount']
-        }
+        # # Требование к рекрутерам.
+        # recruiter_data = {
+        #     'experienceYears': request.data['experienceYears'],
+        #     'specialSkills': request.data['specialSkills'],
+        #     'additionalTasks': request.data['additionalTasks'],
+        #     'isIndividual': request.data['isIndividual'],
+        #     'blacklistedCompanies': request.data['blacklistedCompanies'],
+        #     'recruiterCount': request.data['recruiterCount']
+        # }
 
-        recruiter_serializer = RecruiterSerializer(data=recruiter_data)
-        if recruiter_serializer.is_valid():
-            recruiter = desc_serializer.save()
-        else:
-            return Response(
-                {'message': 'Произошла ошибка при создании объекта рекрутер.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        # recruiter_serializer = RecruiterSerializer(data=recruiter_data)
+        # if recruiter_serializer.is_valid():
+        #     recruiter = desc_serializer.save()
+        # else:
+        #     return Response(
+        #         {'message': 'Произошла ошибка при создании объекта рекрутер.'},
+        #         status=status.HTTP_400_BAD_REQUEST
+        #     )
 
         # Привязка к модели Inquiry
-        inquiry_data = {
-            'name': request.data['name'],
-            'prof': profession,
-            'salary_min': request.data['salaryRange']['salary_min'],
-            'salary_max': request.data['salaryRange']['salary_max'],
-            'city': city,
-            'employeeResponsibilities': request.data['employeeResponsibilities'],
-            'description': desc,
-            'conditions': conditions,
-            'partnership': partnership,
-            'recruiter': recruiter
-        }
+        # inquiry_data = {
+        #     'name': request.data['name'],
+        #     'prof': profession,
+        #     'salary_min': request.data['salaryRange']['salary_min'],
+        #     'salary_max': request.data['salaryRange']['salary_max'],
+        #     'city': city,
+        #     'employeeResponsibilities': request.data['employeeResponsibilities'],
+        #     'description': desc,
+        #     'conditions': conditions,
+        #     'partnership': partnership,
+        #     'recruiter': recruiter
+        # }
 
-        inquiry_serializer = InquirySerializer(data=inquiry_data)
-        if inquiry_serializer.is_valid():
-            inquiry = inquiry_serializer.save()
-        else:
-            return Response(
-                {'message': 'Произошла ошибка при создании  заявки.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        # inquiry_serializer = InquirySerializer(data=inquiry_data)
+        # if inquiry_serializer.is_valid():
+        #     inquiry = inquiry_serializer.save()
+        # else:
+        #     return Response(
+        #         {'message': 'Произошла ошибка при создании  заявки.'},
+        #         status=status.HTTP_400_BAD_REQUEST
+        #     )
 
-        return Response(InquirySerializer(inquiry).data)
+        # return Response
 
 
 class DutyViewSet(viewsets.ModelViewSet):
@@ -301,3 +304,23 @@ class DutyViewSet(viewsets.ModelViewSet):
     queryset = Duty.objects.all()
     filter_backends = (DjangoFilterBackend, )
     filterset_class = DutyFilter
+
+
+class ConditionsViewSet(viewsets.ModelViewSet):
+    serializer_class = ConditionsSerializer
+    queryset = Conditions.objects.all()
+
+
+class DescriptionViewSet(viewsets.ModelViewSet):
+    serializer_class = DescriptionSerializer
+    queryset = Description.objects.all()
+
+
+class ParnershipViewSet(viewsets.ModelViewSet):
+    serializer_class = PartnershipSerializer
+    queryset = Partnership.objects.all()
+
+
+class RecruiterViewSet(viewsets.ModelViewSet):
+    serializer_class = RecruiterSerializer
+    queryset = Recruiter.objects.all()

@@ -470,9 +470,9 @@ class Inquiry(models.Model):
     def __str__(self):
         return self.name
 
-@receiver(pre_save, sender=Inquiry)
-def filter_duties(sender, instance, **kwargs):
-    if instance.prof:
-        prof_area = instance.prof.prof_area
-        duties = Duty.objects.filter(prof_area=prof_area)
-        instance.employeeResponsibilities.set(duties)
+# @receiver(pre_save, sender=Inquiry)
+# def filter_duties(sender, instance, **kwargs):
+#     if instance.prof:
+#         prof_area = instance.prof.prof_area
+#         duties = Duty.objects.filter(prof_area=prof_area)
+#         instance.employeeResponsibilities.set(duties)
