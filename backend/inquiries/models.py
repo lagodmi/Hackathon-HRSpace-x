@@ -272,15 +272,10 @@ class Partnership(models.Model):
 
     def clean(self):
         if self.desiredEmployeeExitDate < timezone.now().date():
-<<<<<<< HEAD
-            raise ValidationError('Дата выхода на работу не может быть раньше сегодняшней даты.')
-    
-=======
             raise ValidationError(
                 'Дата выхода на работу не может быть раньше сегодняшней даты.'
             )
 
->>>>>>> 6f2051ecde6d6dd702133560936296c3f6b2bd32
         if self.desiredEmployeeExitDate < self.desiredFirstResumeDate:
             raise ValidationError(
                 'Дата выхода на работу должна быть позже даты получения резюме'
