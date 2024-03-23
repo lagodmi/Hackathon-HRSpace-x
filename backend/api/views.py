@@ -102,19 +102,13 @@ def get_resumeFormat_key(value):
     return None
 
 
-def socialPackage_con(values: list[str]) -> list[dict]:
-    return [{'name': value} for value in values]
-
-
-@extend_schema(tags=["Inquiries"])
-@extend_schema_view(
-    list=inquiry_list_schema,
-    update=inquiry_update_schema,
-    create=inquiry_create_schema,
-    retrieve=inquiry_retrieve_schema,
-    delete=inquiry_delete_schema,)
-
-
+# @extend_schema(tags=["Inquiries"])
+# @extend_schema_view(
+#     list=inquiry_list_schema,
+#     update=inquiry_update_schema,
+#     create=inquiry_create_schema,
+#     retrieve=inquiry_retrieve_schema,
+#     delete=inquiry_delete_schema,)
 class InquiryViewSet(viewsets.ModelViewSet):
     """
         Вьюсет для заявок.
@@ -192,7 +186,7 @@ class InquiryViewSet(viewsets.ModelViewSet):
             'workSchedule': get_workSchedule_key(request.data['workSchedule']),
             'workFormat': get_workFormat_key(request.data['workFormat']),
             'contractType': get_contractType_key(request.data['contractType']),
-            'socialPackage': socialPackage_con(request.data['socialPackage'])
+            'socialPackage': request.data['socialPackage']
         }
 
         cond_serializer = ConditionsSerializer(data=cond_data)
@@ -200,7 +194,7 @@ class InquiryViewSet(viewsets.ModelViewSet):
             conditions = cond_serializer.save()
         else:
             return Response(
-                {'message': 'Ошибка при создании условия работы.'},
+                {'message': f'Ошибка при создании условия работы. {cond_serializer.errors}'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -230,7 +224,7 @@ class InquiryViewSet(viewsets.ModelViewSet):
             partnership = partnership_serializer.save()
         else:
             return Response(
-                {'message': 'Ошибка при создании условия сотрудничества.'},
+                {'message': f'Ошибка при создании условия сотрудничества. {partnership_serializer.errors}'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -250,19 +244,21 @@ class InquiryViewSet(viewsets.ModelViewSet):
             recruiter = recruiter_serializer.save()
         else:
             return Response(
-                {'message': 'Произошла ошибка при создании объекта рекрутер.'},
+                {'message': f'Произошла ошибка при создании объекта рекрутер. {recruiter_serializer.errors}'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         # Привязка к модели Inquiry
         inquiry_data = {
             'name': request.data['name'],
-            'prof': profession,
+            'prof_area': profession_area,
+            'prof': profession.id,
+            'softwareSkills': request.data['softwareSkills'],
             'salary_min': request.data['salaryRange']['salary_min'],
             'salary_max': request.data['salaryRange']['salary_max'],
-            'city': city,
+            'city': city.id,
             'employeeResponsibilities': request.data['employeeResponsibilities'],
-            'description': desc,
+            'description': desc.id,
             'conditions': conditions,
             'partnership': partnership,
             'recruiter': recruiter
@@ -273,7 +269,7 @@ class InquiryViewSet(viewsets.ModelViewSet):
             inquiry = inquiry_serializer.save()
         else:
             return Response(
-                {'message': 'Произошла ошибка при создании  заявки.'},
+                {'message': f'Произошла ошибка при создании  заявки. {inquiry_serializer.errors}'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
