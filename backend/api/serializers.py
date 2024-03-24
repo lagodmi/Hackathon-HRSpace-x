@@ -116,7 +116,7 @@ class DutySerializer(serializers.ModelSerializer):
     """
         Сериализатор для модели обязанности.
     """
-    prof_area = ProfessionAreaSerializer()
+    prof_area = serializers.PrimaryKeyRelatedField(queryset=ProfessionArea.objects.all())
 
     class Meta:
         model = Duty

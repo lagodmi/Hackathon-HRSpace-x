@@ -114,11 +114,6 @@ class InquiryViewSet(viewsets.ModelViewSet):
         Вьюсет для заявок.
     """
     queryset = Inquiry.objects.all()
-    # serializer_class = InquirySerializer
-    # pagination_class = CustomPaginator
-    # permission_classes = (IsAuthorStaffOrReadOnly,)
-    # filter_backends = (DjangoFilterBackend, )
-    # filterset_class = RecipeFilter
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -249,15 +244,24 @@ class InquiryViewSet(viewsets.ModelViewSet):
             )
 
         # Привязка к модели Inquiry
+        prof_name = request.data['prof']['prof_area']
+        prof_area = ProfessionArea.objects.get(
+            name=prof_name
+        )
+        employeeResponsibilities_data = [
+            {
+                'name': request.data['employeeResponsibilities'][i]['name'],
+                'prof_area': prof_area.id
+            } for i in range(len(request.data['employeeResponsibilities']))
+        ]
         inquiry_data = {
             'name': request.data['name'],
-            'prof_area': profession_area,
             'prof': profession.id,
             'softwareSkills': request.data['softwareSkills'],
             'salary_min': request.data['salaryRange']['salary_min'],
             'salary_max': request.data['salaryRange']['salary_max'],
             'city': city.id,
-            'employeeResponsibilities': request.data['employeeResponsibilities'],
+            'employeeResponsibilities': employeeResponsibilities_data,
             'description': desc.id,
             'conditions': conditions,
             'partnership': partnership,
