@@ -26,7 +26,7 @@ backend развернут и доступен по endpoint:
 - http://127.0.0.1:8000/api/v1/inquiries/
 
 - GET id-заявки
-- http://127.0.0.1:8000/api/v1/inquiries/<id>/
+- http://127.0.0.1:8000/api/v1/inquiries/id/
 ### Пример запросов:
 - 
 ## Автор проекта:
