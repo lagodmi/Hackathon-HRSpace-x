@@ -19,14 +19,14 @@
 - docker exec -it backend_HRSpace sh -c "python manage.py migrate && python manage.py loaddb && python manage.py collectstatic && cp -r /app/collected_static/. /backend_static/static/"
 
 backend развернут и доступен по endpoint:
--POST
--http://127.0.0.1:8000/api/v1/inquiries/
+- POST
+- http://127.0.0.1:8000/api/v1/inquiries/
 
--GET
--http://127.0.0.1:8000/api/v1/inquiries/
+- GET
+- http://127.0.0.1:8000/api/v1/inquiries/
 
--GET id-заявки
--http://127.0.0.1:8000/api/v1/inquiries/<id>/
+- GET id-заявки
+- http://127.0.0.1:8000/api/v1/inquiries/<id>/
 ### Пример запросов:
 - 
 ## Автор проекта:
