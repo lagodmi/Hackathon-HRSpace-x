@@ -17,6 +17,7 @@ services:
 
   backend:
     build: ./backend/
+    container_name: backend_HRSpace
     env_file: .env
     depends_on:
       - db
