@@ -15,8 +15,8 @@
 ### Запуск проекта:
 КОНСОЛЬ!!!
 находясь в корневой директории:
-docker compose -f docker-compose.yml up
-docker exec -it backend_HRSpace sh -c "python manage.py migrate && python manage.py loaddb && python manage.py collectstatic && cp -r /app/collected_static/. /backend_static/static/"
+- docker compose -f docker-compose.yml up
+- docker exec -it backend_HRSpace sh -c "python manage.py migrate && python manage.py loaddb && python manage.py collectstatic && cp -r /app/collected_static/. /backend_static/static/"
 
 backend развернут и доступен по endpoint:
 POST
