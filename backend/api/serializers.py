@@ -105,7 +105,7 @@ class ProfessionSerializer(serializers.ModelSerializer):
     """
         Сериализатор для модели профессии.
     """
-    prof_area = ProfessionAreaSerializer()
+    prof_area = serializers.PrimaryKeyRelatedField(queryset=ProfessionArea.objects.all())
 
     class Meta:
         model = Profession
@@ -116,7 +116,7 @@ class DutySerializer(serializers.ModelSerializer):
     """
         Сериализатор для модели обязанности.
     """
-    prof_area = ProfessionAreaSerializer()
+    prof_area = serializers.PrimaryKeyRelatedField(queryset=ProfessionArea.objects.all())
 
     class Meta:
         model = Duty
@@ -142,21 +142,16 @@ class ConditionsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Conditions
         fields = '__all__'
-        read_only_fields = (
-            'workSchedule',
-            'workFormat',
-            'contractType'
-        )
 
     def create(self, validated_data):
         social_packages_data = validated_data.pop('socialPackage')
-        conditions = SocialPackage.objects.create(**validated_data)
+        conditions = Conditions.objects.create(**validated_data)
 
         for social_package_data in social_packages_data:
-            SocialPackage.objects.create(**social_package_data)
-            print()
+            soc = SocialPackage.objects.create(**social_package_data)
+            conditions.socialPackage.add(soc)
 
-        return conditions
+        return conditions.id
 
 
 class DescriptionSerializer(serializers.ModelSerializer):
@@ -193,164 +188,81 @@ class PartnershipSerializer(serializers.ModelSerializer):
                                             'позже даты получения резюме.'})
         return data
 
+    def create(self, validated_data):
+        recruiter_tasks_data = validated_data.pop('recruiterTasks')
+        partnership = Partnership.objects.create(**validated_data)
+
+        for recruiter_task_data in recruiter_tasks_data:
+            task = TaskRecruiter.objects.create(**recruiter_task_data)
+            partnership.recruiterTasks.add(task)
+
+        return partnership.id
+
 
 class RecruiterSerializer(serializers.ModelSerializer):
     """
         Сериализатор для модели требование к рекрутерам.
     """
-    specialSkills = SkillRecruiterSerializer()
-    additionalTasks = TaskAdditionalSerializer()
-    blacklistedCompanies = CompanySerializer()
+    specialSkills = SkillRecruiterSerializer(many=True)
+    additionalTasks = TaskAdditionalSerializer(many=True)
+    blacklistedCompanies = CompanySerializer(many=True)
 
     class Meta:
         model = Recruiter
         fields = "__all__"
+
+    def create(self, validated_data):
+        special_skills_data = validated_data.pop('specialSkills')
+        additional_tasks_data = validated_data.pop('additionalTasks')
+        blacklisted_companies_data = validated_data.pop('blacklistedCompanies')
+        recruiter = Recruiter.objects.create(**validated_data)
+
+        for special_skill_data in special_skills_data:
+            skill = SkillRecruiter.objects.create(**special_skill_data)
+            recruiter.specialSkills.add(skill)
+
+        for additional_task_data in additional_tasks_data:
+            task = TaskAdditional.objects.create(**additional_task_data)
+            recruiter.additionalTasks.add(task)
+
+        for blacklisted_company_data in blacklisted_companies_data:
+            company = Company.objects.create(**blacklisted_company_data)
+            recruiter.blacklistedCompanies.add(company)
+
+        return recruiter.id
 
 
 class InquirySerializer(serializers.ModelSerializer):
     """
         Сериализатор для модели заявки.
     """
-    prof = ProfessionSerializer()
+    prof = serializers.PrimaryKeyRelatedField(queryset=Profession.objects.all())
     employeeResponsibilities = DutySerializer(many=True)
     softwareSkills = SoftwareSerializer(many=True)
-    city = CitySerializer()
-    description = DescriptionSerializer()
-    conditions = ConditionsSerializer()
-    partnership = PartnershipSerializer()
-    recruiter = RecruiterSerializer()
+    city = serializers.PrimaryKeyRelatedField(queryset=City.objects.all())
+    description = serializers.PrimaryKeyRelatedField(queryset=Description.objects.all())
+    conditions = serializers.PrimaryKeyRelatedField(queryset=Conditions.objects.all())
+    partnership = serializers.PrimaryKeyRelatedField(queryset=Partnership.objects.all())
+    recruiter = serializers.PrimaryKeyRelatedField(queryset=Recruiter.objects.all())
 
     class Meta:
         model = Inquiry
         fields = "__all__"
 
-
-class InquiryPostSerializer(serializers.ModelSerializer):
-    """
-        Сериализатор для модели заявки.
-    """
-    prof = serializers.PrimaryKeyRelatedField(queryset=ProfessionArea.objects.all())
-    employeeResponsibilities = serializers.PrimaryKeyRelatedField(
-        queryset=Duty.objects.all(), many=True)
-    softwareSkills = serializers.PrimaryKeyRelatedField(
-        queryset=Software.objects.all(), many=True)
-    city = serializers.PrimaryKeyRelatedField(queryset=City.objects.all())
-    education = serializers.ChoiceField(choices=EDUCATION)
-    experience = serializers.IntegerField()
-    citizenship = serializers.ChoiceField(choices=CITIZENSHIP)
-    drivingLicense = serializers.BooleanField()
-    carOwnership = serializers.BooleanField()
-
-    workSchedule = serializers.ChoiceField(choices=SCHEDULE)
-    workFormat = serializers.ChoiceField(choices=EMPLOYMENT_METHOD)
-    contractType = serializers.ChoiceField(choices=EMPLOYMENT_TYPE)
-    socialPackage = serializers.PrimaryKeyRelatedField(
-        queryset=SocialPackage.objects.all(), many=True)
-
-    employeeReward = serializers.IntegerField(min_value=MIN_EMPLOYEE_REWARD)
-    paymentType = serializers.ChoiceField(choices=PAYMENT)
-    employeeCount = serializers.IntegerField()
-    recruiterTasks = serializers.PrimaryKeyRelatedField(
-        queryset=TaskRecruiter.objects.all(), many=True)
-    desiredFirstResumeDate = serializers.DateField(input_formats=['%d-%m-%Y'])
-    desiredEmployeeExitDate = serializers.DateField(input_formats=['%d-%m-%Y'])
-    resumeFormat = serializers.ChoiceField(choices=RESUME_OPTIONS)
-
-    experienceYears = serializers.IntegerField()
-    specialSkills = serializers.PrimaryKeyRelatedField(
-        queryset=SkillRecruiter.objects.all(), many=True)
-    additionalTasks = serializers.PrimaryKeyRelatedField(
-        queryset=TaskAdditional.objects.all(), many=True)
-    isIndividual = serializers.BooleanField()
-    blacklistedCompanies = serializers.PrimaryKeyRelatedField(
-        queryset=Company.objects.all(), many=True)
-    recruiterCount = serializers.IntegerField()
-
-    class Meta:
-        model = Inquiry
-        fields = (
-            'name',
-            'prof',
-            'city',
-            'salary_min',
-            'salary_max',
-            'employeeResponsibilities',
-            'education',
-            'experience',
-            'citizenship',
-            'softwareSkills',
-            'drivingLicense',
-            'carOwnership',
-            'workSchedule',
-            'workFormat',
-            'contractType',
-            'socialPackage',
-            'employeeReward',
-            'paymentType',
-            'employeeCount',
-            'recruiterTasks',
-            'resumeFormat',
-            'desiredFirstResumeDate',
-            'desiredEmployeeExitDate',
-            'experienceYears',
-            'specialSkills',
-            'additionalTasks',
-            'isIndividual',
-            'blacklistedCompanies',
-            'recruiterCount'
-        )
-
     def create(self, validated_data):
-        description_data = {
-            'education': validated_data.pop('education'),
-            'experience': validated_data.pop('experience'),
-            'citizenship': validated_data.pop('citizenship'),
-            'drivingLicense': validated_data.pop('drivingLicense'),
-            'carOwnership': validated_data.pop('carOwnership')
-        }
-        conditions_data = {
-            'workSchedule': validated_data.pop('workSchedule'),
-            'workFormat': validated_data.pop('workFormat'),
-            'contractType': validated_data.pop('contractType'),
-            'socialPackage': validated_data.pop('socialPackage'),
-        }
-        parnership_data = {
-            'employeeReward': validated_data.pop('employeeReward'),
-            'paymentType': validated_data.pop('paymentType'),
-            'employeeCount': validated_data.pop('employeeCount'),
-            'recruiterTasks': validated_data.pop('recruiterTasks'),
-            'desiredFirstResumeDate': validated_data.pop(
-                'desiredFirstResumeDate'),
-            'desiredEmployeeExitDate': validated_data.pop(
-                'desiredEmployeeExitDate'),
-            'resumeFormat': validated_data.pop('carOwnership')
-        }
-        recruiter_data = {
-            'experienceYears': validated_data.pop('experienceYears'),
-            'specialSkills': validated_data.pop('specialSkills'),
-            'additionalTasks': validated_data.pop('additionalTasks'),
-            'isIndividual': validated_data.pop('isIndividual'),
-            'blacklistedCompanies': validated_data.pop('blacklistedCompanies'),
-            'recruiterCount': validated_data.pop('recruiterCount'),
-        }
-        description_instance = Description.objects.create(**description_data)
-        conditions_instance = Conditions.objects.create(**conditions_data)
-        parnership_instance = Partnership.objects.create(**parnership_data)
-        recruiter_instance = Recruiter.objects.create(**recruiter_data)
-        inquiry_instance = Inquiry.objects.create(
-            description=description_instance,
-            conditions=conditions_instance,
-            partnership=parnership_instance,
-            recruiter=recruiter_instance,
-            **validated_data)
-        return inquiry_instance
+        employee_responsibilities_data = validated_data.pop('employeeResponsibilities')
+        software_skills_data = validated_data.pop('softwareSkills')
+        inquiry = Inquiry.objects.create(**validated_data)
 
+        for employee_responsibilitie_data in employee_responsibilities_data:
+            duty = Duty.objects.create(**employee_responsibilitie_data)
+            inquiry.employeeResponsibilities.add(duty)
 
+        for software_skill_data in software_skills_data:
+            software = Software.objects.create(**software_skill_data)
+            inquiry.softwareSkills.add(software)
 
-
-
-
-
+        return inquiry
 
 
 # Сериализаторы на GET запросы.
@@ -364,12 +276,23 @@ class ProfessionGetSerializer(serializers.ModelSerializer):
         fields = ('id', 'prof_area', 'prof_name')
 
 
+class CityGetSerializer(serializers.ModelSerializer):
+    """
+        Сериализатор для модели город.
+    """
+    id = serializers.CharField()
+
+    class Meta:
+        model = City
+        fields = "__all__"
+
+
 class InquiryGetSerializer(serializers.ModelSerializer):
     """
         Сериализатор для модели заявки.
     """
     prof = ProfessionGetSerializer()
-    city = CitySerializer()
+    city = CityGetSerializer()
     salaryRange = serializers.SerializerMethodField()
     employeeResponsibilities = serializers.SerializerMethodField()
     education = serializers.SerializerMethodField(source='description')
@@ -414,7 +337,7 @@ class InquiryGetSerializer(serializers.ModelSerializer):
         }
 
     def get_employeeResponsibilities(self, obj):
-        return [duty.name for duty in obj.employeeResponsibilities.all()]
+        return [{'name': duty.name} for duty in obj.employeeResponsibilities.all()]
 
     def get_education(self, obj):
         return obj.description.get_education_display()
@@ -423,7 +346,7 @@ class InquiryGetSerializer(serializers.ModelSerializer):
         return obj.description.get_citizenship_display()
 
     def get_softwareSkills(self, obj):
-        return [duty.name for duty in obj.softwareSkills.all()]
+        return [{'name': duty.name} for duty in obj.softwareSkills.all()]
 
     def get_workSchedule(self, obj):
         return obj.conditions.get_workSchedule_display()
@@ -435,13 +358,13 @@ class InquiryGetSerializer(serializers.ModelSerializer):
         return obj.conditions.get_contractType_display()
 
     def get_socialPackage(self, obj):
-        return [duty.name for duty in obj.conditions.socialPackage.all()]
+        return [{'name': duty.name} for duty in obj.conditions.socialPackage.all()]
 
     def get_paymentType(self, obj):
         return obj.partnership.get_paymentType_display()
 
     def get_recruiterTasks(self, obj):
-        return [duty.name for duty in obj.partnership.recruiterTasks.all()]
+        return [{'name': duty.name} for duty in obj.partnership.recruiterTasks.all()]
 
     def get_resumeFormat(self, obj):
         return obj.partnership.get_resumeFormat_display()
@@ -453,13 +376,13 @@ class InquiryGetSerializer(serializers.ModelSerializer):
         }
 
     def get_specialSkills(self, obj):
-        return [duty.name for duty in obj.recruiter.specialSkills.all()]
+        return [{'name': duty.name} for duty in obj.recruiter.specialSkills.all()]
 
     def get_additionalTasks(self, obj):
-        return [duty.name for duty in obj.recruiter.additionalTasks.all()]
+        return [{'name': duty.name} for duty in obj.recruiter.additionalTasks.all()]
 
     def get_blacklistedCompanies(self, obj):
-        return [duty.name for duty in obj.recruiter.blacklistedCompanies.all()]
+        return [{'name': duty.name} for duty in obj.recruiter.blacklistedCompanies.all()]
 
     class Meta:
         model = Inquiry
