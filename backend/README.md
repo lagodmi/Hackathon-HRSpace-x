@@ -1,17 +1,14 @@
-- создать вирт окружение и установить зависимости
+КОНСОЛЬ!!!
+находясь в корневой директории выполнить команды:
+docker compose -f docker-compose.yml up
+docker exec -it backend_HRSpace sh -c "python manage.py migrate && python manage.py loaddb"
 
-- переименовать файл .env.example в .env
+backend развернут и доступен по endpoint:
+POST
+http://127.0.0.1:8000/api/v1/inquiries/
 
-- запустить docker-compose.postgresql.yml
-    docker compose -f docker-compose.postgresql.yml up
+GET
+http://127.0.0.1:8000/api/v1/inquiries/
 
-- создать миграции
-    python manage.py migrate
-
-- зайти в контейнер
-    docker container exec -it cf43fc78a981 psql -U user -d HRSpace_db
-    - проверить появились ли таблицы стандартного набора
-        \dt
-
-- запустить проект на локалке и проверить что все без ошибок
-    python manage.py runserver
+GET id-заявки
+http://127.0.0.1:8000/api/v1/inquiries/<id>/

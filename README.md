@@ -13,20 +13,20 @@
 - В случае развертывания проекта в производственной среде следует использовать docker-compose.production.yml.
 - Для разработки, тестирования или демонстрации концепции docker-compose.yml.
 ### Запуск проекта:
-- Клонируем репозиторий:
-    ??????
-- Создаем файл .env в корне проекта c параметрами указанными в .env.example:
-    nano .env
-- Выполняем запуск:
-    docker compose -f docker-compose.yml up -d
-- Заходим в интерактивный терминал backend и выполняем команды:
-    - docker compose exec -it backend bash
-        - python manage.py migrate
-        - python manage.py loaddb
-        - python manage.py collectstatic
-        - cp -r /app/collected_static/. /backend_static/static/
-- Проект доступен на:
-    http://localhost:8000/
+КОНСОЛЬ!!!
+находясь в корневой директории выполнить команды:
+docker compose -f docker-compose.yml up
+docker exec -it backend_HRSpace sh -c "python manage.py migrate && python manage.py loaddb"
+
+backend развернут и доступен по endpoint:
+POST
+http://127.0.0.1:8000/api/v1/inquiries/
+
+GET
+http://127.0.0.1:8000/api/v1/inquiries/
+
+GET id-заявки
+http://127.0.0.1:8000/api/v1/inquiries/<id>/
 ### Пример запросов:
 - 
 ## Автор проекта:
