@@ -204,6 +204,7 @@ class InquirySerializer(serializers.ModelSerializer):
     """
         Сериализатор для модели заявки.
     """
+    name = serializers.CharField()
     # prof = ProfessionSerializer()
     prof = serializers.PrimaryKeyRelatedField(
         queryset=Profession.objects.all())
@@ -214,6 +215,8 @@ class InquirySerializer(serializers.ModelSerializer):
     # city = CitySerializer()
     city = serializers.PrimaryKeyRelatedField(
         queryset=City.objects.all())
+    salary_min = serializers.IntegerField()
+    salary_max = serializers.IntegerField()
     education = serializers.ChoiceField(choices=EDUCATION)
     experience = serializers.IntegerField()
     citizenship = serializers.ChoiceField(choices=CITIZENSHIP)
@@ -285,6 +288,9 @@ class InquirySerializer(serializers.ModelSerializer):
         employeeResponsibilities = validated_data.pop(
             'employeeResponsibilities')
         softwareSkills = validated_data.pop('softwareSkills')
+        name = validated_data.pop('name')
+        salary_min = validated_data.pop('salary_min')
+        salary_max = validated_data.pop('salary_max')
         # profession_id = prof_data['id']
         # city_id = city_data['id']
 
@@ -332,15 +338,21 @@ class InquirySerializer(serializers.ModelSerializer):
         recruiter_instance.additionalTasks.set(additionalTasks)
         recruiter_instance.blacklistedCompanies.set(blacklistedCompanies)
         inquiry_instance = Inquiry.objects.create(
+            name=name,
             prof=profession, city=city,
+            salary_min=salary_min,
+            salary_max=salary_max,
             description=description_instance,
             conditions=conditions_instance,
             partnership=parnership_instance,
-            recruiter=recruiter_instance,
-            **validated_data)
+            recruiter=recruiter_instance)
         inquiry_instance.employeeResponsibilities.set(employeeResponsibilities)
         inquiry_instance.softwareSkills.set(softwareSkills)
         return inquiry_instance
+    
+    def to_representation(self, instance):
+        return InquiryGetSerializer(instance,
+                                    context=self.context).data
     # def to_representation(self, instance):
     #     data = super().to_representation(instance)
     #     if instance.prof:
