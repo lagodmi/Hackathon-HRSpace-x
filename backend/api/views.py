@@ -1,6 +1,9 @@
 from rest_framework import status, viewsets
 from rest_framework.response import Response
+from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import extend_schema_view, extend_schema
 
+from .filters import DutyFilter
 from .serializers import (
     CitySerializer,
     ConditionsSerializer,
@@ -10,8 +13,10 @@ from .serializers import (
     ProfessionSerializer,
     InquiryGetSerializer,
     RecruiterSerializer,
+    DutySerializer
 )
 from inquiries.models import (
+    Duty,
     City,
     Inquiry,
     Profession,
@@ -23,6 +28,8 @@ from .swagger import (
     inquiry_create_schema,
     inquiry_retrieve_schema,
     inquiry_delete_schema,
+    duty_list_schema,
+    duty_retrieve_schema,
 )
 from .utils import (
     get_citizenship_key,
@@ -35,13 +42,13 @@ from .utils import (
 )
 
 
-# @extend_schema(tags=["Inquiries"])
-# @extend_schema_view(
-#     list=inquiry_list_schema,
-#     update=inquiry_update_schema,
-#     create=inquiry_create_schema,
-#     retrieve=inquiry_retrieve_schema,
-#     delete=inquiry_delete_schema,)
+@extend_schema(tags=["Inquiries"])
+@extend_schema_view(
+    list=inquiry_list_schema,
+    update=inquiry_update_schema,
+    create=inquiry_create_schema,
+    retrieve=inquiry_retrieve_schema,
+    delete=inquiry_delete_schema,)
 class InquiryViewSet(viewsets.ModelViewSet):
     """
     Вьюсет для заявок.
