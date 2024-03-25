@@ -1,10 +1,10 @@
-from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter
-from rest_framework import permissions, serializers
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from drf_spectacular.utils import (extend_schema, OpenApiExample,
+                                   OpenApiParameter)
+from rest_framework import serializers
 from rest_framework import status
 
-from .serializers import InquiryGetSerializer, InquirySerializer, DutySerializer
+from .serializers import (InquiryGetSerializer, InquirySerializer,
+                          DutySerializer)
 
 
 class DummyDetailStatusSerializer(serializers.Serializer):
