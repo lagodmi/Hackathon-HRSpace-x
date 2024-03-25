@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from django.core.exceptions import ValidationError
 from django.utils import timezone
 
+from inquiries.constants import MIN_EMPLOYEE_REWARD
 from inquiries.models import (
     City,
     Company,
@@ -18,16 +18,6 @@ from inquiries.models import (
     SocialPackage,
     TaskAdditional,
     TaskRecruiter,
-)
-from inquiries.constants import (
-    SCHEDULE,
-    CITIZENSHIP,
-    EDUCATION,
-    EMPLOYMENT_METHOD,
-    EMPLOYMENT_TYPE,
-    MIN_EMPLOYEE_REWARD,
-    PAYMENT,
-    RESUME_OPTIONS,
 )
 
 
@@ -48,16 +38,6 @@ class CompanySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Company
-        fields = "__all__"
-
-
-class ProfessionAreaSerializer(serializers.ModelSerializer):
-    """
-        Сериализатор для модели профессиональной области.
-    """
-
-    class Meta:
-        model = ProfessionArea
         fields = "__all__"
 
 
@@ -105,7 +85,9 @@ class ProfessionSerializer(serializers.ModelSerializer):
     """
         Сериализатор для модели профессии.
     """
-    prof_area = serializers.PrimaryKeyRelatedField(queryset=ProfessionArea.objects.all())
+    prof_area = serializers.PrimaryKeyRelatedField(
+        queryset=ProfessionArea.objects.all()
+    )
 
     class Meta:
         model = Profession
@@ -116,7 +98,9 @@ class DutySerializer(serializers.ModelSerializer):
     """
         Сериализатор для модели обязанности.
     """
-    prof_area = serializers.PrimaryKeyRelatedField(queryset=ProfessionArea.objects.all())
+    prof_area = serializers.PrimaryKeyRelatedField(
+        queryset=ProfessionArea.objects.all()
+    )
 
     class Meta:
         model = Duty
@@ -236,21 +220,33 @@ class InquirySerializer(serializers.ModelSerializer):
     """
         Сериализатор для модели заявки.
     """
-    prof = serializers.PrimaryKeyRelatedField(queryset=Profession.objects.all())
+    prof = serializers.PrimaryKeyRelatedField(
+        queryset=Profession.objects.all()
+    )
     employeeResponsibilities = DutySerializer(many=True)
     softwareSkills = SoftwareSerializer(many=True)
     city = serializers.PrimaryKeyRelatedField(queryset=City.objects.all())
-    description = serializers.PrimaryKeyRelatedField(queryset=Description.objects.all())
-    conditions = serializers.PrimaryKeyRelatedField(queryset=Conditions.objects.all())
-    partnership = serializers.PrimaryKeyRelatedField(queryset=Partnership.objects.all())
-    recruiter = serializers.PrimaryKeyRelatedField(queryset=Recruiter.objects.all())
+    description = serializers.PrimaryKeyRelatedField(
+        queryset=Description.objects.all()
+    )
+    conditions = serializers.PrimaryKeyRelatedField(
+        queryset=Conditions.objects.all()
+    )
+    partnership = serializers.PrimaryKeyRelatedField(
+        queryset=Partnership.objects.all()
+    )
+    recruiter = serializers.PrimaryKeyRelatedField(
+        queryset=Recruiter.objects.all()
+    )
 
     class Meta:
         model = Inquiry
         fields = "__all__"
 
     def create(self, validated_data):
-        employee_responsibilities_data = validated_data.pop('employeeResponsibilities')
+        employee_responsibilities_data = validated_data.pop(
+            'employeeResponsibilities'
+        )
         software_skills_data = validated_data.pop('softwareSkills')
         inquiry = Inquiry.objects.create(**validated_data)
 
@@ -337,7 +333,8 @@ class InquiryGetSerializer(serializers.ModelSerializer):
         }
 
     def get_employeeResponsibilities(self, obj):
-        return [{'name': duty.name} for duty in obj.employeeResponsibilities.all()]
+        return [{'name': odject.name}
+                for odject in obj.employeeResponsibilities.all()]
 
     def get_education(self, obj):
         return obj.description.get_education_display()
@@ -346,7 +343,7 @@ class InquiryGetSerializer(serializers.ModelSerializer):
         return obj.description.get_citizenship_display()
 
     def get_softwareSkills(self, obj):
-        return [{'name': duty.name} for duty in obj.softwareSkills.all()]
+        return [{'name': odject.name} for odject in obj.softwareSkills.all()]
 
     def get_workSchedule(self, obj):
         return obj.conditions.get_workSchedule_display()
@@ -358,31 +355,39 @@ class InquiryGetSerializer(serializers.ModelSerializer):
         return obj.conditions.get_contractType_display()
 
     def get_socialPackage(self, obj):
-        return [{'name': duty.name} for duty in obj.conditions.socialPackage.all()]
+        return [{'name': odject.name}
+                for odject in obj.conditions.socialPackage.all()]
 
     def get_paymentType(self, obj):
         return obj.partnership.get_paymentType_display()
 
     def get_recruiterTasks(self, obj):
-        return [{'name': duty.name} for duty in obj.partnership.recruiterTasks.all()]
+        return [{'name': odject.name}
+                for odject in obj.partnership.recruiterTasks.all()]
 
     def get_resumeFormat(self, obj):
         return obj.partnership.get_resumeFormat_display()
 
     def get_dates(self, obj):
         return {
-            'desiredFirstResumeDate': obj.partnership.desiredFirstResumeDate.strftime('%d-%m-%Y'),
-            'desiredEmployeeExitDate': obj.partnership.desiredEmployeeExitDate.strftime('%d-%m-%Y')
+            'desiredFirstResumeDate':
+            obj.partnership.desiredFirstResumeDate.strftime('%d-%m-%Y'),
+
+            'desiredEmployeeExitDate':
+            obj.partnership.desiredEmployeeExitDate.strftime('%d-%m-%Y')
         }
 
     def get_specialSkills(self, obj):
-        return [{'name': duty.name} for duty in obj.recruiter.specialSkills.all()]
+        return [{'name': odject.name}
+                for odject in obj.recruiter.specialSkills.all()]
 
     def get_additionalTasks(self, obj):
-        return [{'name': duty.name} for duty in obj.recruiter.additionalTasks.all()]
+        return [{'name': odject.name}
+                for odject in obj.recruiter.additionalTasks.all()]
 
     def get_blacklistedCompanies(self, obj):
-        return [{'name': duty.name} for duty in obj.recruiter.blacklistedCompanies.all()]
+        return [{'name': odject.name}
+                for odject in obj.recruiter.blacklistedCompanies.all()]
 
     class Meta:
         model = Inquiry

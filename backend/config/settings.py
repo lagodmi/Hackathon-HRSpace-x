@@ -66,8 +66,8 @@ DATABASES = {
         'NAME': os.getenv('POSTGRES_DB', 'HRSpace_db'),
         'USER': os.getenv('POSTGRES_USER', 'user'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'password'),
-        'HOST': os.getenv('DB_HOST', 'db'),
-        'PORT': os.getenv('DB_PORT', 5432)
+        'HOST': 'localhost',
+        'PORT': os.getenv('DB_PORT', 5454)
     }
 }
 

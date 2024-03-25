@@ -11,5 +11,4 @@ router.register(r'duties', DutyViewSet, basename='duties')
 
 urlpatterns = [
     path('v1/', include(router.urls)),
-
-   ]
+]

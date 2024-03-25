@@ -24,7 +24,6 @@ from .serializers import (
     DutySerializer,
     InquirySerializer,
     PartnershipSerializer,
-    ProfessionAreaSerializer,
     ProfessionSerializer,
     ProfessionGetSerializer,
     InquiryGetSerializer,
@@ -225,7 +224,6 @@ class InquiryViewSet(viewsets.ModelViewSet):
                 {'message': f'Ошибка при создании условия сотрудничества. {partnership_serializer.errors}'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-
 
         # Требование к рекрутерам.
         recruiter_data = {

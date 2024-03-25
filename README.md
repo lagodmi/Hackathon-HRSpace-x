@@ -35,6 +35,9 @@ GET
 GET id-заявки
 
 - http://127.0.0.1:8000/api/v1/inquiries/id/
+
+[ожидаемый json](backend/expected%20_json.json)
+
 ### Пример запросов:
 - 
 ## Автор проекта:
