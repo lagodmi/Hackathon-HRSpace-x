@@ -3,8 +3,9 @@ from rest_framework import status, viewsets, filters
 from rest_framework import permissions
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema_view, extend_schema
-
+from .filters import DutyFilter
 from inquiries.constants import (
     CITIZENSHIP,
     EDUCATION,
@@ -49,6 +50,8 @@ from .swagger import (
     inquiry_create_schema,
     inquiry_retrieve_schema,
     inquiry_delete_schema,
+    duty_list_schema,
+    duty_retrieve_schema,
 )
 
 
@@ -101,13 +104,13 @@ def get_resumeFormat_key(value):
     return None
 
 
-# @extend_schema(tags=["Inquiries"])
-# @extend_schema_view(
-#     list=inquiry_list_schema,
-#     update=inquiry_update_schema,
-#     create=inquiry_create_schema,
-#     retrieve=inquiry_retrieve_schema,
-#     delete=inquiry_delete_schema,)
+@extend_schema(tags=["Inquiries"])
+@extend_schema_view(
+    list=inquiry_list_schema,
+    update=inquiry_update_schema,
+    create=inquiry_create_schema,
+    retrieve=inquiry_retrieve_schema,
+    delete=inquiry_delete_schema,)
 class InquiryViewSet(viewsets.ModelViewSet):
     """
         Вьюсет для заявок.
@@ -276,3 +279,15 @@ class InquiryViewSet(viewsets.ModelViewSet):
             )
 
         return Response(InquirySerializer(inquiry).data)
+
+
+@extend_schema(tags=["Duties"])
+@extend_schema_view(
+    list=duty_list_schema,
+    retrieve=duty_retrieve_schema,)
+class DutyViewSet(viewsets.ModelViewSet):
+    """Вьюсет для обязанности, фильтр по названию профессии"""
+    serializer_class = DutySerializer
+    queryset = Duty.objects.all()
+    filter_backends = (DjangoFilterBackend, )
+    filterset_class = DutyFilter

@@ -1,10 +1,10 @@
-from drf_spectacular.utils import extend_schema, OpenApiExample
+from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter
 from rest_framework import permissions, serializers
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from .serializers import InquiryGetSerializer
+from .serializers import InquiryGetSerializer, InquirySerializer, DutySerializer
 
 
 class DummyDetailStatusSerializer(serializers.Serializer):
@@ -12,16 +12,14 @@ class DummyDetailStatusSerializer(serializers.Serializer):
     details = serializers.CharField()
 
 
-responses_exmpl = {
+inquiry_list_schema = extend_schema(
+    summary="Получить список заявок",
+    responses={
             status.HTTP_200_OK: InquiryGetSerializer,
             status.HTTP_400_BAD_REQUEST: DummyDetailStatusSerializer,
             status.HTTP_401_UNAUTHORIZED: DummyDetailStatusSerializer,
             status.HTTP_403_FORBIDDEN: DummyDetailStatusSerializer,
-    }
-
-inquiry_list_schema = extend_schema(
-    summary="Получить список заявок",
-    responses=responses_exmpl,
+    },
     examples=[
                 OpenApiExample(
                     "Get example",
@@ -95,173 +93,184 @@ inquiry_list_schema = extend_schema(
 
 inquiry_update_schema = extend_schema(
     summary="Изменение существующей заявки",
-    responses=responses_exmpl
+    responses={
+            status.HTTP_200_OK: InquirySerializer,
+            status.HTTP_400_BAD_REQUEST: DummyDetailStatusSerializer,
+            status.HTTP_401_UNAUTHORIZED: DummyDetailStatusSerializer,
+            status.HTTP_403_FORBIDDEN: DummyDetailStatusSerializer,
+    }
 )
 
 inquiry_create_schema = extend_schema(
     summary="Создание новой заявки",
-    responses=responses_exmpl
+    responses={
+            status.HTTP_200_OK: InquirySerializer,
+            status.HTTP_400_BAD_REQUEST: DummyDetailStatusSerializer,
+            status.HTTP_401_UNAUTHORIZED: DummyDetailStatusSerializer,
+            status.HTTP_403_FORBIDDEN: DummyDetailStatusSerializer,
+    },
+    examples=[
+                OpenApiExample(
+                    "Post example",
+                    description="Пример для post-запроса заявки",
+                    value={
+                        "name": "Маша",
+                        "prof": {
+                            "id": 26,
+                            "prof_area": "Розничная торговля",
+                            "prof_name": "Директор магазина"
+                        },
+                        "city": {
+                            "id": "7439",
+                            "name": "Эрзин"
+                        },
+                        "salaryRange": {
+                            "salary_min": 40000,
+                            "salary_max": 50000
+                        },
+                        "employeeResponsibilities": [
+                            {"name": "Управление брендом компании"},
+                            {"name": "PR-деятельность и связи с общественностью"},
+                            {"name": "Анализ эффективности маркетинговых мероприятий"}
+                        ],
+                        "education": "Любое",
+                        "experience": 1,
+                        "citizenship": "Не имеет значения",
+                        "softwareSkills": [
+                            {"name": "Adobe Illustrator"},
+                            {"name": "Adobe InDesign"},
+                            {"name": "Google Docs"}
+                        ],
+                        "drivingLicense": False,
+                        "carOwnership": False,
+                        "workSchedule": "Вахтовый метод",
+                        "workFormat": "Полный день",
+                        "contractType": "Договор ГПХ с физ.лицом",
+                        "socialPackage": [
+                                {"name": "Гибкое начало дня"},
+                                {"name": "ДМС"},
+                                {"name": "ДМС со стоматологией"}
+                            ],
+                        "employeeReward": 10000000,
+                        "paymentType": "50% за выход + 50% по окончании гарантийного периода (1-3 мес.)",
+                        "employeeCount": 5,
+                        "recruiterTasks": [
+                            {"name": "Организация собеседований с заказчиком, синхронизация по времени соискателя и заказчика"},
+                            {"name": "Запрос рекомендаций с предыдущих мест работы"}
+                        ],
+                        "resumeFormat": "Резюме кандидатов, с которыми проведено интервью (с комментариями)",
+                        "dates": {
+                            "desiredFirstResumeDate": "26-03-2024",
+                            "desiredEmployeeExitDate": "28-03-2024"
+                        },
+                        "experienceYears": 4,
+                        "specialSkills": [
+                            {"name": "Проведение собеседований"},
+                            {"name": "Работа с HR-платформами"},
+                            {"name": "Оценка компетенций"}
+                        ],
+                        "additionalTasks": [
+                            {"name": "Организация тренингов и семинаров для повышения квалификации персонала"},
+                            {"name": "Ведение отчетности по итогам подбора персонала"},
+                            {"name": "Анализ эффективности каналов поиска кандидатов"}
+                        ],
+                        "isIndividual": True,
+                        "blacklistedCompanies": [
+                            {"name": "1C"}
+                        ],
+                        "recruiterCount": 1,
+                        "acceptOffer": True
+                    },
+                    status_codes=[str(status.HTTP_200_OK)],
+                ),
+            ],
 )
 
 inquiry_retrieve_schema = extend_schema(
     summary="Детальная информация о заявке",
-    responses=responses_exmpl
+    responses={
+            status.HTTP_200_OK: InquiryGetSerializer,
+            status.HTTP_400_BAD_REQUEST: DummyDetailStatusSerializer,
+            status.HTTP_401_UNAUTHORIZED: DummyDetailStatusSerializer,
+            status.HTTP_403_FORBIDDEN: DummyDetailStatusSerializer,
+    }
 )
 
 inquiry_delete_schema = extend_schema(
     summary="Удаление заявки",
-    responses=responses_exmpl
+    responses={
+            status.HTTP_200_OK: InquiryGetSerializer,
+            status.HTTP_400_BAD_REQUEST: DummyDetailStatusSerializer,
+            status.HTTP_401_UNAUTHORIZED: DummyDetailStatusSerializer,
+            status.HTTP_403_FORBIDDEN: DummyDetailStatusSerializer,
+    }
 )
 
+duty_list_schema = extend_schema(
+    summary="Список обязанностей",
+    responses={
+            status.HTTP_200_OK: DutySerializer,
+            status.HTTP_400_BAD_REQUEST: DummyDetailStatusSerializer,
+            status.HTTP_401_UNAUTHORIZED: DummyDetailStatusSerializer,
+            status.HTTP_403_FORBIDDEN: DummyDetailStatusSerializer,
+    },
+    parameters=[
+            OpenApiParameter(
+                name='prof_area',
+                location=OpenApiParameter.QUERY,
+                description='Параметр для поиска навыков выбранной проф.области',
+                required=False,
+                type=str
+            ),
+    ],
+    examples=[
+                OpenApiExample(
+                    "get duties list example",
+                    description="Пример для get-запроса списка обязанностей",
+                    value=[
+                            {
+                                "id": 67,
+                                "name": "PR-деятельность и связи с общественностью",
+                                "prof_area": 7
+                            },
+                            {
+                                "id": 122,
+                                "name": "PR-деятельность и связи с общественностью",
+                                "prof_area": 2
+                            }
+                        ],
+                    status_codes=[str(status.HTTP_200_OK)],
+                ),
+            ]
+)
 
-# # class ExampleSerializer(serializers.Serializer):
-# #     name = serializers.CharField()
-# #     prof = serializers.DictField()
-# #     city = serializers.DictField()
-# #     salaryRange = serializers.DictField()
-# #     employeeResponsibilities = serializers.ListField(
-# #         child=serializers.CharField())
-# #     education = serializers.CharField()
-# #     experience = serializers.IntegerField()
-# #     citizenship = serializers.CharField()
-# #     softwareSkills = serializers.ListField(child=serializers.CharField())
-# #     drivingLicense = serializers.BooleanField()
-# #     carOwnership = serializers.BooleanField()
-# #     workSchedule = serializers.CharField()
-# #     workFormat = serializers.CharField()
-# #     contractType = serializers.CharField()
-# #     socialPackage = serializers.ListField(child=serializers.CharField())
-# #     employeeReward = serializers.IntegerField()
-# #     paymentType = serializers.CharField()
-# #     employeeCount = serializers.IntegerField()
-# #     recruiterTasks = serializers.ListField(child=serializers.CharField())
-# #     resumeFormat = serializers.CharField()
-# #     dates = serializers.DictField()
-# #     experienceYears = serializers.IntegerField()
-# #     specialSkills = serializers.ListField(child=serializers.CharField())
-# #     additionalTasks = serializers.ListField(child=serializers.CharField())
-# #     isIndividual = serializers.BooleanField()
-# #     blacklistedCompanies = serializers.ListField(child=serializers.CharField())
-# #     recruiterCount = serializers.IntegerField()
-
-
-# @swagger_auto_schema(request_body=openapi.Schema(
-#     type=openapi.TYPE_OBJECT,
-    
-# ))
-# # class ExampleAPIView(APIView):
-# #     serializer_class = ExampleSerializer
-
-# #     def get(self, request):
-# #         serializer = self.serializer_class(data=request.data)
-# #         if serializer.is_valid():
-# #             return Response(serializer.validated_data,
-# #                             status=status.HTTP_200_OK)
-# #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-# class ExampleRequestBodyInspector(FieldInspector):
-#     def process_result(self, result, method_name, obj, **kwargs):
-#         result = super().process_result(result, method_name, obj, **kwargs)
-#         if method_name == 'get':
-#             result['request_body'] = openapi.Schema(
-#                 type=openapi.TYPE_OBJECT,
-#                 properties={
-#         'name': openapi.Schema(type=openapi.TYPE_STRING, example='Автомойщик'),
-#         'prof': openapi.Schema(type=openapi.TYPE_OBJECT, properties={
-#             'id': openapi.Schema(type=openapi.TYPE_INTEGER, example=239),
-#             'prof_area': openapi.Schema(type=openapi.TYPE_STRING,
-#                                         example='Автомобильный бизнес'),
-#             'prof_name': openapi.Schema(type=openapi.TYPE_STRING,
-#                                         example='Автомойщик'),
-#         }),
-#         'city': openapi.Schema(type=openapi.TYPE_OBJECT, properties={
-#             'id': openapi.Schema(type=openapi.TYPE_INTEGER, example=21),
-#             'name': openapi.Schema(type=openapi.TYPE_STRING,
-#                                    example='Красноярск'),
-#         }),
-#         'salaryRange': openapi.Schema(type=openapi.TYPE_OBJECT, properties={
-#             'salary_min': openapi.Schema(type=openapi.TYPE_INTEGER,
-#                                          example=111111),
-#             'salary_max': openapi.Schema(type=openapi.TYPE_INTEGER,
-#                                          example=222222),
-#         }),
-#         'employeeResponsibilities': openapi.Schema(
-#             type=openapi.TYPE_ARRAY,
-#             items=openapi.Items(type=openapi.TYPE_STRING),
-#             example=['PR-деятельность и связи с общественностью',
-#                      'Активные продажи']),
-#         'education': openapi.Schema(type=openapi.TYPE_STRING,
-#                                     example='Неоконченное высшее'),
-#         'experience': openapi.Schema(type=openapi.TYPE_INTEGER, example=3),
-#         'citizenship': openapi.Schema(type=openapi.TYPE_STRING,
-#                                       example='Россия'),
-#         'softwareSkills': openapi.Schema(
-#             type=openapi.TYPE_ARRAY,
-#             items=openapi.Items(type=openapi.TYPE_STRING),
-#             example=['MS Office', 'Photoshop']),
-#         'drivingLicense': openapi.Schema(type=openapi.TYPE_BOOLEAN,
-#                                          example=True),
-#         'carOwnership': openapi.Schema(type=openapi.TYPE_BOOLEAN,
-#                                        example=False),
-#         'workSchedule': openapi.Schema(type=openapi.TYPE_STRING,
-#                                        example='Полный рабочий день'),
-#         'workFormat': openapi.Schema(type=openapi.TYPE_STRING,
-#                                      example='Удаленная работа'),
-#         'contractType': openapi.Schema(type=openapi.TYPE_STRING, 
-#                                        example='Постоянная'),
-#         'socialPackage': openapi.Schema(
-#             type=openapi.TYPE_ARRAY,
-#             items=openapi.Items(type=openapi.TYPE_STRING),
-#             example=['Медицинское страхование', 'Отпускные']),
-#         'employeeReward': openapi.Schema(type=openapi.TYPE_INTEGER,
-#                                          example=50000),
-#         'paymentType': openapi.Schema(type=openapi.TYPE_STRING,
-#                                       example='Ежемесячно'),
-#         'employeeCount': openapi.Schema(type=openapi.TYPE_INTEGER,
-#                                         example=10),
-#         'recruiterTasks': openapi.Schema(
-#             type=openapi.TYPE_ARRAY,
-#             items=openapi.Items(type=openapi.TYPE_STRING),
-#             example=['Подбор персонала', 'Собеседования']),
-#         'resumeFormat': openapi.Schema(type=openapi.TYPE_STRING,
-#                                        example='PDF'),
-#         'dates': openapi.Schema(type=openapi.TYPE_OBJECT, properties={
-#             'start_date': openapi.Schema(type=openapi.TYPE_STRING,
-#                                          format=openapi.FORMAT_DATE, example='2022-01-01'),
-#             'end_date': openapi.Schema(type=openapi.TYPE_STRING,
-#                                        format=openapi.FORMAT_DATE, example='2022-12-31'),
-#         }),
-#         'experienceYears': openapi.Schema(type=openapi.TYPE_INTEGER, example=5),
-#         'specialSkills': openapi.Schema(
-#             type=openapi.TYPE_ARRAY,
-#             items=openapi.Items(type=openapi.TYPE_STRING),
-#             example=['Английский язык', 'Водительские права категории B']),
-#         'additionalTasks': openapi.Schema(
-#             type=openapi.TYPE_ARRAY,
-#             items=openapi.Items(type=openapi.TYPE_STRING),
-#             example=['Управление проектами', 'Организация мероприятий']),
-#         'isIndividual': openapi.Schema(type=openapi.TYPE_BOOLEAN,
-#                                        example=False),
-#         'blacklistedCompanies': openapi.Schema(
-#             type=openapi.TYPE_ARRAY,
-#             items=openapi.Items(type=openapi.TYPE_STRING),
-#             example=['Company A', 'Company B']),
-#         'recruiterCount': openapi.Schema(type=openapi.TYPE_INTEGER, example=2),
-#     },
-#     required=['__all__']
-#             )
-#         return result
-
-
-# schema_view = get_schema_view(
-#     openapi.Info(
-#         title="Your API",
-#         default_version='v1',
-#         description="Description of your API",
-#         terms_of_service="https://www.example.com/policies/terms/",
-#         contact=openapi.Contact(email="contact@example.com"),
-#         license=openapi.License(name="BSD License"),
-#     ),
-#     public=True,
-#     permission_classes=(permissions.AllowAny,),
-#     inspector=ExampleRequestBodyInspector
+duty_retrieve_schema = extend_schema(
+    summary="Детальная информация об обязанности",
+    responses={
+            status.HTTP_200_OK: DutySerializer,
+            status.HTTP_400_BAD_REQUEST: DummyDetailStatusSerializer,
+            status.HTTP_401_UNAUTHORIZED: DummyDetailStatusSerializer,
+            status.HTTP_403_FORBIDDEN: DummyDetailStatusSerializer,
+    },
+    parameters=[
+            OpenApiParameter(
+                name='prof_area',
+                location=OpenApiParameter.PATH,
+                description='Параметр для поиска навыков выбранной проф.области',
+                required=True,
+                type=int
+            ),
+    ],
+    examples=[
+                OpenApiExample(
+                    "get duties retrieve example",
+                    description="Пример для get-запроса обязанности",
+                    value={
+                                "id": 67,
+                                "name": "PR-деятельность и связи с общественностью",
+                                "prof_area": 7
+                            },
+                    status_codes=[str(status.HTTP_200_OK)],
+                ),
+            ]
+)
