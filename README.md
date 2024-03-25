@@ -2,7 +2,7 @@
 ## Описание проекта:
 - 
 ## Стек проекта:
-- Python 3.9
+- Python 3.11
 - Django 3.2.3
 - Django REST framework 3.12.4
 - JavaScript
@@ -10,7 +10,7 @@
 - 
 ## Процесс запуска проекта (через docker compose):
 ### Какую версию развернуть:
-- Для разработки, тестирования или демонстрации концепции docker-compose.yml.
+- Для демонстрации концепции docker-compose.yml.
 ### Запуск проекта:
 переименовать файл:
 
@@ -35,7 +35,7 @@ GET id-заявки
 
 - http://127.0.0.1:8000/api/v1/inquiries/id/
 
-[ожидаемый json](backend/expected%20_json.json)
+[ожидаемый json](backend/readme_data/expected%20_json.json)
 
 ### Пример запросов:
 - 

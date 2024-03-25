@@ -25,6 +25,7 @@ services:
       - static:/backend_static
       - media:/app/media
 
+# в разработке.
   # frontend:
   #   env_file: .env
   #   build: ./frontend/
