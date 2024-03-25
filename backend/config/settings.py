@@ -107,11 +107,11 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "HRSpace Inquiry API", # название проекта
-    "VERSION": "0.0.1", # версия проекта
-    "SERVE_INCLUDE_SCHEMA": False, # исключить эндпоинт /schema
+    "TITLE": "HRSpace Inquiry API",  # название проекта
+    "VERSION": "0.0.1",  # версия проекта
+    "SERVE_INCLUDE_SCHEMA": False,  # исключить эндпоинт /schema
     "SWAGGER_UI_SETTINGS": {
-        "filter": True, # включить поиск по тегам
+        "filter": True,  # включить поиск по тегам
     },
     "COMPONENT_SPLIT_REQUEST": True
 }

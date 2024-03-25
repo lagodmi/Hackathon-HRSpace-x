@@ -1,5 +1,5 @@
-from rest_framework import serializers
 from django.utils import timezone
+from rest_framework import serializers
 
 from inquiries.constants import MIN_EMPLOYEE_REWARD
 from inquiries.models import (
