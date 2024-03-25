@@ -66,8 +66,8 @@ DATABASES = {
         'NAME': os.getenv('POSTGRES_DB', 'HRSpace_db'),
         'USER': os.getenv('POSTGRES_USER', 'user'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'password'),
-        'HOST': 'localhost',
-        'PORT': os.getenv('DB_PORT', 5454)
+        'HOST': os.getenv('DB_HOST', 'db'),
+        'PORT': os.getenv('DB_PORT', 5432)
     }
 }
 
@@ -107,11 +107,11 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "HRSpace Inquiry API", # название проекта
-    "VERSION": "0.0.1", # версия проекта
-    "SERVE_INCLUDE_SCHEMA": False, # исключить эндпоинт /schema
+    "TITLE": "HRSpace Inquiry API",  # название проекта
+    "VERSION": "0.0.1",  # версия проекта
+    "SERVE_INCLUDE_SCHEMA": False,  # исключить эндпоинт /schema
     "SWAGGER_UI_SETTINGS": {
-        "filter": True, # включить поиск по тегам
+        "filter": True,  # включить поиск по тегам
     },
     "COMPONENT_SPLIT_REQUEST": True
 }
