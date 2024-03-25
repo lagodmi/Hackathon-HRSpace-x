@@ -45,8 +45,8 @@
     ],
     "resumeFormat": "Резюме кандидатов, с которыми проведено интервью (с комментариями)",
     "dates": {
-        "desiredFirstResumeDate": "2024-03-26",
-        "desiredEmployeeExitDate": "2024-03-28"
+        "desiredFirstResumeDate": "01-01-2025",
+        "desiredEmployeeExitDate": "05-05-2025"
     },
     "experienceYears": 4,
     "specialSkills": [
