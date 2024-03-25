@@ -223,3 +223,15 @@ class InquiryViewSet(viewsets.ModelViewSet):
             )
 
         return Response(InquirySerializer(inquiry).data)
+
+
+@extend_schema(tags=["Duties"])
+@extend_schema_view(
+    list=duty_list_schema,
+    retrieve=duty_retrieve_schema,)
+class DutyViewSet(viewsets.ModelViewSet):
+    """Вьюсет для обязанности, фильтр по названию профессии"""
+    serializer_class = DutySerializer
+    queryset = Duty.objects.all()
+    filter_backends = (DjangoFilterBackend, )
+    filterset_class = DutyFilter

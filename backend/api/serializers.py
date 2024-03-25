@@ -154,8 +154,8 @@ class PartnershipSerializer(serializers.ModelSerializer):
     """
     recruiterTasks = TaskRecruiterSerializer(many=True)
     employeeReward = serializers.IntegerField(min_value=MIN_EMPLOYEE_REWARD)
-    desiredFirstResumeDate = serializers.DateField(format="%d-%m-%Y")
-    desiredEmployeeExitDate = serializers.DateField(format="%d-%m-%Y")
+    desiredFirstResumeDate = serializers.DateField(input_formats=['%d-%m-%Y'])
+    desiredEmployeeExitDate = serializers.DateField(input_formats=['%d-%m-%Y'])
 
     class Meta:
         model = Partnership
